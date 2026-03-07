@@ -9,6 +9,7 @@ function mapreader.make_clue(clue)
 			name = clue.name,
 			type = clue.type, 
 			is_discovered = clue.is_discovered, 
+			carried = clue.carried,
 			image = clue.image, 
 			description = clue.description,
 			depends_on = clue.depends_on,
@@ -21,7 +22,7 @@ function mapreader.set_size(size_table)
 end
 
 function mapreader.readfile(filename)
-	dofile(filename)
+	loadfile (filename, "t", {set_size=mapreader.set_size, make_clue=mapreader.make_clue})()
 end
 
 

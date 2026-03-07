@@ -1,7 +1,7 @@
-mapreader.set_size{
+set_size{
 	size=35
 }
-mapreader.make_clue{
+make_clue{
 	name="ring",
 	type="object",
 	is_discovered=false,
@@ -12,7 +12,7 @@ mapreader.make_clue{
 	action = { position = {5, 5} }
 }
 
-mapreader.make_clue{
+make_clue{
 	name="victim",
 	type="body",
 	is_discovered = false,

@@ -89,6 +89,8 @@ function ingame.draw_clues()
 	local screen_h = love.graphics.getHeight()
 
 	for key,value in pairs(ingame.clues) do
+		if value.carried and value.is_discovered then goto continue end
+
 		local object_position_x = value.action.position[1]
 		local object_position_y = value.action.position[2]
 		local scale = square_size/ingame.clues_images[key]:getWidth()-- square images only
@@ -96,6 +98,8 @@ function ingame.draw_clues()
 
 		love.graphics.draw(ingame.clues_images[key], screen_w/2-square_size*(ingame.detective.x-object_position_x), 
 		screen_h/2-square_size*(ingame.detective.y-object_position_y), 0, scale, scale, origin, origin)
+
+		::continue::
 	end
 
 	ingame.draw_clues_in_summary()
