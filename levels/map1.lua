@@ -1,5 +1,5 @@
 mapreader.set_size{
-	size=20
+	size=35
 }
 mapreader.make_clue{
 	name="ring",

@@ -80,8 +80,8 @@ function ingame.draw()
 	-- draw the detective
 	love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*ingame.detective.facing_direction, scale, 10, 10) 
 
+	ingame.draw_pick_up_tooltip()
 end
-
 
 function ingame.draw_clues()
 	local square_size = 60
@@ -91,23 +91,56 @@ function ingame.draw_clues()
 	for key,value in pairs(ingame.clues) do
 		local object_position_x = value.action.position[1]
 		local object_position_y = value.action.position[2]
-		local scale = 60/ingame.clues_images[key]:getWidth()-- square images only
+		local scale = square_size/ingame.clues_images[key]:getWidth()-- square images only
 		local origin = ingame.clues_images[key]:getWidth()/2
 
 		love.graphics.draw(ingame.clues_images[key], screen_w/2-square_size*(ingame.detective.x-object_position_x), 
 		screen_h/2-square_size*(ingame.detective.y-object_position_y), 0, scale, scale, origin, origin)
 	end
+
+	ingame.draw_clues_in_summary()
 end
 
 function ingame.draw_clues_in_summary() 
+	local square_size = 60
+	local prev_r,prev_g,prev_b = love.graphics.getColor()
+	love.graphics.setColor(0.5, 0.4, 0.4, 0.25)
+	love.graphics.rectangle("fill", 50, 0, love.graphics.getWidth()-100, square_size)
+	love.graphics.setColor(prev_r,prev_g,prev_b)
 
+	--in this function, we don't care about the origin
+	local placement = 50
+	for key,value in pairs(ingame.clues) do
+		if ingame.clues[key].is_discovered then
+			local scale = square_size/ingame.clues_images[key]:getWidth()-- square images only
+			love.graphics.draw(ingame.clues_images[key], placement, 0, 0, scale, scale)
+			placement = placement + square_size
+		end
+	end
 end
 
+function ingame.draw_pick_up_tooltip() 
+	for key,value in pairs(ingame.clues) do
+		local object_position_x = value.action.position[1]
+		local object_position_y = value.action.position[2]
+		local screen_w = love.graphics.getWidth()
+		local screen_h = love.graphics.getHeight()
+		if not value.is_discovered then
+			if(object_position_x == ingame.detective.x and object_position_y == ingame.detective.y) then
+				love.graphics.print("use the space key to discover object", screen_w/2, screen_h/2)
+			end
+		end
+	end
+end
 
 function ingame.update(delta_time, transition_to_menu_state)
 	if love.keyboard.isDown("escape") then
 		transition_to_menu_state()
 	end 
+
+	if love.keyboard.isDown("space") then
+		ingame.pick_up_object()
+	end
 
 	move_player(delta_time)
 end
@@ -194,5 +227,17 @@ function ingame.no_collision_clues(xpos, ypos)
 	end
 	return true
 end
+
+function ingame.pick_up_object()
+	for key,value in pairs(ingame.clues) do
+		local object_position_x = value.action.position[1]
+		local object_position_y = value.action.position[2]
+
+		if object_position_x == ingame.detective.x and object_position_y == ingame.detective.y then
+			value.is_discovered = true
+		end
+	end
+end
+
 
 return ingame
