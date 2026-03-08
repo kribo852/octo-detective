@@ -21,8 +21,18 @@ function mapreader.set_size(size_table)
 	mapreader.size = size_table.size
 end
 
+function mapreader.set_detective(detective)
+	mapreader.detective = detective
+end
+
 function mapreader.readfile(filename)
-	loadfile (filename, "t", {set_size=mapreader.set_size, make_clue=mapreader.make_clue})()
+	loadfile (filename, "t", 
+		{
+			set_size=mapreader.set_size, 
+			make_clue=mapreader.make_clue,
+			set_detective=mapreader.set_detective
+		}
+	)()
 end
 
 

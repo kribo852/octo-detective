@@ -33,7 +33,7 @@ end
 to make this generic, in this file we dont know what the arguments are, they are just passed
 throught the argument_lookup_table, then the update function of the state is called with 
 delta time, and then the correct arguments
-]=]--
+]=]
 function game_state_engine.update(delta_time, argument_lookup_table)
 	if game_state_engine.state ~= game_state_engine.next_state then
 		if(game_state_engine[game_state_engine.state] and game_state_engine[game_state_engine.state].teardown_func) then

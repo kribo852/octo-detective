@@ -17,14 +17,11 @@ function ingame.init()
 	for i=1,ingame.size do
 		ingame.obstacles[i] = {}
 		for j=1,ingame.size do
-			if ingame.no_collision_clues(i, j) and love.math.random() < 0.18 then
+			if not ingame.collision_with_clue(i, j) and love.math.random() < 0.18 then
 				ingame.obstacles[i][j] = "tree"
 			end
 		end
 	end
-
-	ingame.detective.x = ingame.size/2
-	ingame.detective.y = ingame.size/2
 end
 
 function ingame.read_from_mapreader()
@@ -43,10 +40,31 @@ function ingame.read_from_mapreader()
 		ingame.clues[mapreader.clues[i].name] = mapreader.clues[i]
 	end
 
+	ingame.detective.x = mapreader.detective.position.x
+	ingame.detective.y = mapreader.detective.position.y
+
 	mapreader = nil
 end
 
 function ingame.draw()
+	local scale = 3
+	local screen_w = love.graphics.getWidth()
+	local screen_h = love.graphics.getHeight()
+
+	ingame.draw_obstacles()
+
+	ingame.draw_clues()
+	ingame.draw_clues_in_summary()
+	 
+	-- draw the detective
+	love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*ingame.detective.facing_direction, scale, 10, 10) 
+
+	ingame.draw_pick_up_tooltip()
+
+	ingame.draw_object_description_placeholder()
+end
+
+function ingame.draw_obstacles()
 
 	local square_size = 60
 	local tree = love.graphics.newQuad(0, 0, 20, 20, ingame.world_img)
@@ -74,13 +92,6 @@ function ingame.draw()
 			end
 		end
 	end
-
-	ingame.draw_clues()
-	 
-	-- draw the detective
-	love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*ingame.detective.facing_direction, scale, 10, 10) 
-
-	ingame.draw_pick_up_tooltip()
 end
 
 function ingame.draw_clues()
@@ -101,8 +112,6 @@ function ingame.draw_clues()
 
 		::continue::
 	end
-
-	ingame.draw_clues_in_summary()
 end
 
 function ingame.draw_clues_in_summary() 
@@ -130,11 +139,34 @@ function ingame.draw_pick_up_tooltip()
 		local screen_w = love.graphics.getWidth()
 		local screen_h = love.graphics.getHeight()
 		if not value.is_discovered then
-			if(object_position_x == ingame.detective.x and object_position_y == ingame.detective.y) then
-				love.graphics.print("use the space key to discover object", screen_w/2, screen_h/2)
+			if ingame.same_position_as_detective(object_position_x, object_position_y) then
+				ingame.draw_centered_text("Use the space key to discover object")
 			end
 		end
 	end
+end
+
+function ingame.draw_object_description_placeholder()
+	
+end
+
+function ingame.draw_object_description() 
+
+	local clue_key = ingame.collision_with_clue(ingame.detective.x, ingame.detective.y)
+
+	if clue_key then
+		ingame.draw_centered_text(ingame.clues[clue_key].description)
+	else
+		ingame.draw_object_description_placeholder = function() end -- now the function is empty
+	end
+end
+
+function ingame.draw_centered_text(text)
+	love.graphics.printf(text, love.graphics.getWidth()/2, love.graphics.getHeight()/2, 300, "center", 0, 1.5, 1.5, 150)
+end
+
+function ingame.same_position_as_detective(x, y)
+	return x == ingame.detective.x and y == ingame.detective.y
 end
 
 function ingame.update(delta_time, transition_to_menu_state)
@@ -220,16 +252,16 @@ function make_move_function(xdir, ydir, x_pos, y_pos)
 	end
 end
 
-function ingame.no_collision_clues(xpos, ypos)
+function ingame.collision_with_clue(xpos, ypos)
 	for key,value in pairs(ingame.clues) do
 		local object_position_x = value.action.position[1]
 		local object_position_y = value.action.position[2]
 
 		if object_position_x == xpos and object_position_y == ypos then
-			return false
+			return key
 		end
 	end
-	return true
+	return false
 end
 
 function ingame.pick_up_object()
@@ -237,11 +269,12 @@ function ingame.pick_up_object()
 		local object_position_x = value.action.position[1]
 		local object_position_y = value.action.position[2]
 
-		if object_position_x == ingame.detective.x and object_position_y == ingame.detective.y then
+		if ingame.same_position_as_detective(object_position_x, object_position_y) then
 			value.is_discovered = true
+			ingame.draw_object_description_placeholder = ingame.draw_object_description 
+			-- start drawing the description, we want the effect that the description is only shown when we first pick up an item 
 		end
 	end
 end
-
 
 return ingame
