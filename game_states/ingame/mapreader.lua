@@ -25,14 +25,59 @@ function mapreader.set_detective(detective)
 	mapreader.detective = detective
 end
 
+
 function mapreader.readfile(filename)
 	loadfile (filename, "t", 
 		{
 			set_size=mapreader.set_size, 
 			make_clue=mapreader.make_clue,
-			set_detective=mapreader.set_detective
+			set_detective=mapreader.set_detective,
+			set_police_car=function(police_car) mapreader.police_car=police_car end,
+			none=mapreader.none, 
+			one=mapreader.one,
+			all=mapreader.all
 		}
 	)()
+end
+
+function mapreader.none()
+	return function(names_of_discovered_clues) return true end -- no items needs to be discovered for this to be true
+end
+
+function mapreader.one( ... )
+	local collect = {...}
+	return function(names_of_discovered_clues) 
+		for index,value in ipairs(collect) do
+			if type(value) == "string" then
+				if names_of_discovered_clues[value] then
+					return true
+				end
+			else 
+				if value(names_of_discovered_clues) then
+					return true
+				end
+			end
+		end
+		return false
+	end
+end
+
+function mapreader.all( ... )
+	local collect = {...}
+	return function(names_of_discovered_clues) 
+		for index,value in ipairs(collect) do
+			if type(value) == "string" then
+				if not names_of_discovered_clues[value] then
+					return false
+				end
+			else 
+				if not value(names_of_discovered_clues) then
+					return false
+				end
+			end
+		end
+		return true
+	end
 end
 
 
