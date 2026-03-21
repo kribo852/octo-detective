@@ -10,10 +10,12 @@ function mapreader.make_clue(clue)
 			type = clue.type, 
 			is_discovered = clue.is_discovered, 
 			carried = clue.carried,
-			image = clue.image, 
+			image = clue.image,
+			display_on_ground_image = clue.display_on_ground_image,
 			description = clue.description,
 			depends_on = clue.depends_on,
-			action = clue.action -- action to unlock, when all dependencies are fulfilled, these are anded together
+			discovery_positions = clue.discovery_positions, -- discover at these positions
+			discovery_wait = clue.discovery_wait
 	})
 end
 
@@ -33,18 +35,18 @@ function mapreader.readfile(filename)
 			make_clue=mapreader.make_clue,
 			set_detective=mapreader.set_detective,
 			set_police_car=function(police_car) mapreader.police_car=police_car end,
-			none=mapreader.none, 
-			one=mapreader.one,
-			all=mapreader.all
+			none=mapreader.none_clues, 
+			one=mapreader.one_clues,
+			all=mapreader.all_clues
 		}
 	)()
 end
 
-function mapreader.none()
+function mapreader.none_clues()
 	return function(names_of_discovered_clues) return true end -- no items needs to be discovered for this to be true
 end
 
-function mapreader.one( ... )
+function mapreader.one_clues( ... )
 	local collect = {...}
 	return function(names_of_discovered_clues) 
 		for index,value in ipairs(collect) do
@@ -62,7 +64,7 @@ function mapreader.one( ... )
 	end
 end
 
-function mapreader.all( ... )
+function mapreader.all_clues( ... )
 	local collect = {...}
 	return function(names_of_discovered_clues) 
 		for index,value in ipairs(collect) do
@@ -79,6 +81,5 @@ function mapreader.all( ... )
 		return true
 	end
 end
-
 
 return mapreader 

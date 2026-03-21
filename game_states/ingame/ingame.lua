@@ -17,7 +17,7 @@ function ingame.init()
 	for i=1,ingame.size do
 		ingame.obstacles[i] = {}
 		for j=1,ingame.size do
-			if not ingame.clue_handler.collision_with_clue(i, j) and love.math.random() < 0.18 then
+			if not ingame.clue_handler.collision_with_clue(i, j) and love.math.random() < 0.3 then
 				ingame.obstacles[i][j] = "tree"
 			end
 		end
@@ -38,7 +38,11 @@ function ingame.read_from_mapreader()
 
 	for i=1,#mapreader.clues do
 		if(not ingame.clues_images[mapreader.clues[i].name]) then
-			ingame.clues_images[mapreader.clues[i].name] = love.graphics.newImage(mapreader.clues[i].image)
+			ingame.clues_images[mapreader.clues[i].name] = {}
+			ingame.clues_images[mapreader.clues[i].name]["image"] = love.graphics.newImage(mapreader.clues[i].image)
+			if mapreader.clues[i].display_on_ground_image then 
+				ingame.clues_images[mapreader.clues[i].name]["display_on_ground_image"] = love.graphics.newImage(mapreader.clues[i].display_on_ground_image)
+			end
 		end
 		clues[mapreader.clues[i].name] = mapreader.clues[i]
 	end
@@ -116,18 +120,17 @@ function ingame.draw_clues()
 	local screen_w = love.graphics.getWidth()
 	local screen_h = love.graphics.getHeight()
 
-	local to_be_drawn_on_ground_clues = ingame.clue_handler.is_visible_on_the_ground()
+	local to_be_drawn_on_ground_clues = ingame.clue_handler.is_visible_on_the_ground()--maybe redo this later so that it only returns a list of positions and a name
 
 	for index,value in ipairs(to_be_drawn_on_ground_clues) do
+		local image = ingame.clues_images[value.name]["display_on_ground_image"] or ingame.clues_images[value.name]["image"]
+		local scale = square_size/image:getWidth()-- square images only
+		local origin = image:getWidth()/2
 
-		local object_position_x = value.action.position[1]
-		local object_position_y = value.action.position[2]
-		local scale = square_size/ingame.clues_images[value.name]:getWidth()-- square images only
-		local origin = ingame.clues_images[value.name]:getWidth()/2
-
-		love.graphics.draw(ingame.clues_images[value.name], screen_w/2-square_size*(ingame.detective.x-object_position_x), 
-		screen_h/2-square_size*(ingame.detective.y-object_position_y), 0, scale, scale, origin, origin)
-
+		for _,position in ipairs(value.discovery_positions) do
+			love.graphics.draw(image, screen_w/2-square_size*(ingame.detective.x-position[1]), 
+				screen_h/2-square_size*(ingame.detective.y-position[2]), 0, scale, scale, origin, origin)
+		end
 	end
 end
 
@@ -141,9 +144,9 @@ function ingame.draw_clues_in_summary()
 	--in this function, we don't care about the origin
 	local placement = 50
 	for index,clue in ipairs(ingame.clue_handler.get_discovered_summary()) do
-		local scale = square_size/ingame.clues_images[clue.name]:getWidth()-- square images only
-		love.graphics.draw(ingame.clues_images[clue.name], placement, 0, 0, scale, scale)
-		placement = placement + square_size
+		local image = ingame.clues_images[clue.name]["image"]
+		local scale = square_size/image:getWidth()-- square images only
+		love.graphics.draw(image, placement+(index-1)*square_size, 0, 0, scale, scale)
 	end
 end
 
@@ -153,7 +156,7 @@ function ingame.draw_pick_up_tooltip()
 	local screen_h = love.graphics.getHeight()
 
 	if tmp_clue then
-		ingame.draw_centered_text("Use the space key to discover object")
+		ingame.draw_centered_text("Use the space key to discover a clue")
 	end
 
 end
