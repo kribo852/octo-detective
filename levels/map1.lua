@@ -43,7 +43,7 @@ make_clue{
 	is_discovered = false,
 	carried = false,
 	image = "suspect.png",
-	description = "A picture of the perpitrator emerges, who is the the victims husband? \n I should go back to the police car and make a call to the station",
+	description = "A picture of the perpetrator emerges, who is the the victims husband? \n I should go back to the police car and make a call to the station",
 	depends_on = all("wallet", "ring"),
 	discovery_wait = 10 --in seconds
 }

@@ -126,7 +126,7 @@ end
 function clue_handler.collision_with_clue(xpos, ypos)
 	for key,value in pairs(clue_handler.clues) do
 		if not value.discovery_positions then
-			return false
+			goto continue
 		end
 
 		for i,v in ipairs(value.discovery_positions) do
@@ -134,6 +134,7 @@ function clue_handler.collision_with_clue(xpos, ypos)
 				return key
 			end
 		end
+		::continue::
 	end
 	return false
 end
