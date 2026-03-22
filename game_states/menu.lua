@@ -1,9 +1,10 @@
 local menu = {}
 
 function menu.draw() 
-	love.graphics.print("Menu", 300, 100)
-	love.graphics.print("Start new game", 300, 200)
-	love.graphics.print("Quit", 300, 300) 
+	love.graphics.print("Menu", 300, 100, 0, 1.5)
+	love.graphics.print("Start new game", 300, 200, 0, 1.5)
+	love.graphics.print("Quit", 300, 300, 0, 1.5) 
+	love.graphics.rectangle("line", love.mouse.getX()-10, love.mouse.getY()-10, 20, 20, 5, 5)
 end
 
 function menu.update(delta_time, transition_game_state)

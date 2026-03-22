@@ -4,7 +4,7 @@ local ingame -- a hack to remember, had to declare the variables here, so that t
 
 function love.load()
 	love.graphics.setDefaultFilter("nearest")
-	love.graphics.setBackgroundColor( 0, 0.05, 0.05 )
+	love.graphics.setBackgroundColor( 0.03, 0.1, 0.05 )
 	love.window.setTitle("octo-detective")
 
 	game_state_engine = require "game_state_engine.game_state_engine"
