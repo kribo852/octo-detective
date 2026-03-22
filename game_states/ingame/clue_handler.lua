@@ -58,7 +58,15 @@ function clue_handler.is_visible_on_the_ground()
 				or (clue.is_discovered and not clue.carried)) and clue.discovery_positions
 	end
 
-	return clue_handler.find_all_matching(matcher)
+	local clues_to_draw = clue_handler.find_all_matching(matcher)
+	local rtn_stripped_clue_information = {}
+
+	for _,value in ipairs(clues_to_draw) do
+		for __,position_value in ipairs(value.discovery_positions) do
+			table.insert(rtn_stripped_clue_information, {pos_x = position_value[1], pos_y = position_value[2], name=value.name })
+		end
+	end
+	return rtn_stripped_clue_information
 end
 
 function clue_handler.get_discovered_summary()

@@ -120,17 +120,15 @@ function ingame.draw_clues()
 	local screen_w = love.graphics.getWidth()
 	local screen_h = love.graphics.getHeight()
 
-	local to_be_drawn_on_ground_clues = ingame.clue_handler.is_visible_on_the_ground()--maybe redo this later so that it only returns a list of positions and a name
+	local to_be_drawn_on_ground_clue_positions = ingame.clue_handler.is_visible_on_the_ground()
 
-	for index,value in ipairs(to_be_drawn_on_ground_clues) do
-		local image = ingame.clues_images[value.name]["display_on_ground_image"] or ingame.clues_images[value.name]["image"]
+	for _,position in ipairs(to_be_drawn_on_ground_clue_positions) do
+		local image = ingame.clues_images[position.name]["display_on_ground_image"] or ingame.clues_images[position.name]["image"]
 		local scale = square_size/image:getWidth()-- square images only
 		local origin = image:getWidth()/2
 
-		for _,position in ipairs(value.discovery_positions) do
-			love.graphics.draw(image, screen_w/2-square_size*(ingame.detective.x-position[1]), 
-				screen_h/2-square_size*(ingame.detective.y-position[2]), 0, scale, scale, origin, origin)
-		end
+		love.graphics.draw(image, screen_w/2-square_size*(ingame.detective.x-position.pos_x), 
+			screen_h/2-square_size*(ingame.detective.y-position.pos_y), 0, scale, scale, origin, origin)
 	end
 end
 
