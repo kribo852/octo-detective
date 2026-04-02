@@ -26,7 +26,7 @@ function ingame.init()
 end
 
 function ingame.read_from_mapreader()
-	mapreader = require "game_states.ingame.mapreader"
+	local mapreader = require "game_states.ingame.mapreader"
 
 	mapreader.readfile("levels/map1.lua")
 
@@ -53,8 +53,6 @@ function ingame.read_from_mapreader()
 	ingame.spawn_police_car(mapreader.police_car)
 
 	ingame.clue_handler.set_clues(clues)
-
-	mapreader = nil
 end
 
 function ingame.draw()

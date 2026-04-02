@@ -1,4 +1,4 @@
-set_size{
+set_size {
 	size = 35
 }
 set_detective {
@@ -33,7 +33,7 @@ make_clue {
 	is_discovered = false,
 	carried = true,
 	image = "wallet.png",
-	description = "This wallet contains a photo of a couple and an adress. The woman in the picture is the victim.",
+	description = "This wallet contains a photo of a couple, a credit card and an adress. The woman in the picture is the victim. The credit card belongs to the person name<victim>",
 	depends_on = one("victim"),
 	discovery_positions = { {25, 0} }
 }
@@ -43,17 +43,17 @@ make_clue {
 	is_discovered = false,
 	carried = false,
 	image = "suspect.png",
-	description = "A picture of the perpetrator emerges, who is the the victims husband?\nI should go back to the police car and make a call to the station.",
+	description = "A picture of the perpetrator emerges, who is name<victim>'s husband?\nI should go back to the police car and make a call to the station.",
 	depends_on = all("wallet", "ring"),
 	discovery_wait = 10 --in seconds
 }
 make_clue {
-	name = "Dan Wright",
-	type = "Person",
+	name = "murderer",
+	type = "person",
 	is_discovered = false,
 	carried = true,
 	image = "suspect.png",
-	description = "Dan Wright is the husband of the victim Isabella, says the registers at the police station.",
+	description = "name<murderer> is the husband of the victim name<victim>, says the registers at the police station.",
 	depends_on = one("suspect"),
 	display_on_ground_image = "call_police_station.png",
 	discovery_positions = { {-2, 35},{0, 35},{-1, 34},{-1, 36} }

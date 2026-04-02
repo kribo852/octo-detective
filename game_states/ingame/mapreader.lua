@@ -2,6 +2,7 @@
 
 local mapreader = {
 	clues = {},
+	name_generator = require "name_generator"
 }
 
 function mapreader.make_clue(clue)
@@ -12,7 +13,7 @@ function mapreader.make_clue(clue)
 			carried = clue.carried,
 			image = clue.image,
 			display_on_ground_image = clue.display_on_ground_image,
-			description = clue.description,
+			description = mapreader.name_tokens(clue.description),
 			depends_on = clue.depends_on,
 			discovery_positions = clue.discovery_positions, -- discover at these positions
 			discovery_wait = clue.discovery_wait
@@ -80,6 +81,12 @@ function mapreader.all_clues( ... )
 		end
 		return true
 	end
+end
+
+function mapreader.name_tokens(name)
+	local token_box_pattern = "name%<%a+%d?%>"
+
+	return string.gsub(name, token_box_pattern, mapreader.name_generator.replace_token_with_name)
 end
 
 return mapreader 
