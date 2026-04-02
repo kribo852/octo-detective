@@ -5,8 +5,8 @@ local ingame = {
 	police_car_img = love.graphics.newImage("police_car.png"),
 	detective = {facing_direction=1},
 	clues_images = {},
-	clues = {},
-	clue_handler = require "game_states.ingame.clue_handler"
+	clue_handler = require "game_states.ingame.clue_handler",
+	clue_summary_control = require "game_states.ingame.clue_summary_control",
 }
 
 function ingame.init()
@@ -55,26 +55,7 @@ function ingame.read_from_mapreader()
 	ingame.clue_handler.set_clues(clues)
 end
 
-function ingame.draw()
-	local scale = 3
-	local screen_w = love.graphics.getWidth()
-	local screen_h = love.graphics.getHeight()
-
-	ingame.draw_obstacles()
-
-	ingame.draw_clues()
-
-	ingame.draw_clues_in_summary()
-	 
-	-- draw the detective
-	love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*ingame.detective.facing_direction, scale, 10, 10) 
-
-	ingame.draw_pick_up_tooltip()
-
-	ingame.draw_object_description()
-end
-
-function ingame.draw_obstacles()
+local function draw_obstacles()
 
 	local square_size = 60
 	local tree = love.graphics.newQuad(0, 0, 20, 20, ingame.world_img)
@@ -112,8 +93,29 @@ function ingame.draw_obstacles()
 	end
 end
 
+local function draw_centered_text(text)
+	love.graphics.printf(text, love.graphics.getWidth()/2, love.graphics.getHeight()/2, 300, "center", 0, 1.5, 1.5, 150)
+end
 
-function ingame.draw_clues()
+local function draw_object_description() 
+	local description = ingame.clue_handler.get_active_clue_description()
+
+	if description then
+		draw_centered_text(description)
+	end
+end
+
+local function draw_pick_up_tooltip() 
+	local tmp_clue = ingame.clue_handler.can_be_discovered()
+	local screen_w = love.graphics.getWidth()
+	local screen_h = love.graphics.getHeight()
+
+	if tmp_clue then
+		draw_centered_text("Use the space key to discover a clue")
+	end
+end
+
+local function draw_clues()
 	local square_size = 60
 	local screen_w = love.graphics.getWidth()
 	local screen_h = love.graphics.getHeight()
@@ -130,44 +132,40 @@ function ingame.draw_clues()
 	end
 end
 
-function ingame.draw_clues_in_summary() 
-	local square_size = 60
-	local prev_r,prev_g,prev_b = love.graphics.getColor()
-	love.graphics.setColor(0.5, 0.4, 0.4, 0.25)
-	love.graphics.rectangle("fill", 50, 0, love.graphics.getWidth()-100, square_size)
-	love.graphics.setColor(prev_r,prev_g,prev_b)
-
-	--in this function, we don't care about the origin
-	local placement = 50
-	for index,clue in ipairs(ingame.clue_handler.get_discovered_summary()) do
-		local image = ingame.clues_images[clue.name]["image"]
-		local scale = square_size/image:getWidth()-- square images only
-		love.graphics.draw(image, placement+(index-1)*square_size, 0, 0, scale, scale)
-	end
-end
-
-function ingame.draw_pick_up_tooltip() 
-	local tmp_clue = ingame.clue_handler.can_be_discovered()
+function ingame.draw()
+	local scale = 3
 	local screen_w = love.graphics.getWidth()
 	local screen_h = love.graphics.getHeight()
 
-	if tmp_clue then
-		ingame.draw_centered_text("Use the space key to discover a clue")
+	draw_obstacles()
+
+	draw_clues()
+
+	ingame.clue_summary_control.draw(ingame.dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
+	 
+	-- draw the detective
+	love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*ingame.detective.facing_direction, scale, 10, 10) 
+
+	draw_pick_up_tooltip()
+
+	draw_object_description()
+end
+
+function ingame.dicovered_clues_name_iterator()
+	local index = 0
+	local discovered_clues = ingame.clue_handler.get_discovered_summary()
+
+	return function()
+		index=index+1
+		if index <= #discovered_clues then
+			return index,discovered_clues[index].name
+		end	
 	end
-
 end
 
-function ingame.draw_object_description() 
-	local description = ingame.clue_handler.get_active_clue_description()
-
-	if description then
-		ingame.draw_centered_text(description)
-	end
-end
-
-function ingame.draw_centered_text(text)
-	love.graphics.printf(text, love.graphics.getWidth()/2, love.graphics.getHeight()/2, 300, "center", 0, 1.5, 1.5, 150)
-end
+function ingame.clue_summary_image_getter(image_name)
+ 	return ingame.clues_images[image_name]["image"]
+end 
 
 function ingame.update(delta_time, transition_to_menu_state)
 	if love.keyboard.isDown("escape") then
@@ -181,6 +179,7 @@ function ingame.update(delta_time, transition_to_menu_state)
 	move_player(delta_time)
 
 	ingame.clue_handler.check_disable_description()
+	ingame.clue_summary_control.check_for_clue_clicked()
 end
 
 function move_player(delta_time)
@@ -265,5 +264,9 @@ function ingame.spawn_police_car(police_car)
 	ingame.obstacles[police_car.position.x] = {}
 	ingame.obstacles[police_car.position.x][police_car.position.y] = "police_car"
 end
+
+
+-- if a person is clicked, then give the option to arrest them
+
 
 return ingame

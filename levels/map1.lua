@@ -39,21 +39,21 @@ make_clue {
 }
 make_clue {
 	name="suspect",
-	type="person",
+	type="criminal profile",
 	is_discovered = false,
 	carried = false,
 	image = "suspect.png",
 	description = "A picture of the perpetrator emerges, who is name<victim>'s husband?\nI should go back to the police car and make a call to the station.",
 	depends_on = all("wallet", "ring"),
-	discovery_wait = 10 --in seconds
+	discovery_wait = 10 --in seconds, this is not implemented
 }
 make_clue {
-	name = "murderer",
+	name = "name<murderer>",
 	type = "person",
 	is_discovered = false,
 	carried = true,
 	image = "suspect.png",
-	description = "name<murderer> is the husband of the victim name<victim>, says the registers at the police station.",
+	description = "name<murderer> is the husband of the victim name<victim>, says the officer at the police station.",
 	depends_on = one("suspect"),
 	display_on_ground_image = "call_police_station.png",
 	discovery_positions = { {-2, 35},{0, 35},{-1, 34},{-1, 36} }

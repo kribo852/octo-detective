@@ -7,7 +7,7 @@ local mapreader = {
 
 function mapreader.make_clue(clue)
 	table.insert(mapreader.clues, {
-			name = clue.name,
+			name = mapreader.name_tokens(clue.name),
 			type = clue.type, 
 			is_discovered = clue.is_discovered, 
 			carried = clue.carried,
