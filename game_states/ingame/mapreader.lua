@@ -8,7 +8,8 @@ local mapreader = {
 function mapreader.make_clue(clue)
 	table.insert(mapreader.clues, {
 			name = mapreader.name_tokens(clue.name),
-			type = clue.type, 
+			type = clue.type,
+			is_murderer = clue.is_murderer, 
 			is_discovered = clue.is_discovered, 
 			carried = clue.carried,
 			image = clue.image,

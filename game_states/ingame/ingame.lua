@@ -3,11 +3,15 @@ local ingame = {
 	world_img = love.graphics.newImage("objects.png"), 
 	detective_image = love.graphics.newImage("detective.png"),
 	police_car_img = love.graphics.newImage("police_car.png"),
+	mobile_phone_image = love.graphics.newImage("call_police_station.png"),
 	detective = {facing_direction=1},
 	clues_images = {},
 	clue_handler = require "game_states.ingame.clue_handler",
 	clue_summary_control = require "game_states.ingame.clue_summary_control",
 }
+
+local square_size = 60
+local scale = 3
 
 function ingame.init()
 	ingame.obstacles = {}
@@ -17,12 +21,13 @@ function ingame.init()
 	for i=1,ingame.size do
 		ingame.obstacles[i] = {}
 		for j=1,ingame.size do
-			if not ingame.clue_handler.collision_with_clue(i, j) and love.math.random() < 0.3 then
+			if not ingame.clue_handler.collision_with_clue(i, j) and love.math.random() < 0.15 then
 				ingame.obstacles[i][j] = "tree"
 			end
 		end
 	end
 	ingame.clue_handler.set_get_player_position(function() return ingame.detective.x, ingame.detective.y end)
+	ingame.game_state = "ongoing"
 end
 
 function ingame.read_from_mapreader()
@@ -36,7 +41,7 @@ function ingame.read_from_mapreader()
 
 	local clues = {}
 
-	for i=1,#mapreader.clues do
+	for i=1, #mapreader.clues do
 		if(not ingame.clues_images[mapreader.clues[i].name]) then
 			ingame.clues_images[mapreader.clues[i].name] = {}
 			ingame.clues_images[mapreader.clues[i].name]["image"] = love.graphics.newImage(mapreader.clues[i].image)
@@ -55,12 +60,19 @@ function ingame.read_from_mapreader()
 	ingame.clue_handler.set_clues(clues)
 end
 
-local function draw_obstacles()
+local function run_if_ready_to_arrest(func_to_run)
+	local discovered_clues = ingame.clue_handler.get_discovered_summary()
+	local index = ingame.clue_summary_control.get_selected_index()
 
-	local square_size = 60
+	if #discovered_clues > 0 and discovered_clues[index] and discovered_clues[index].type == "person" and 
+		ingame.game_state=="ongoing" then
+			func_to_run()
+	end
+end
+
+local function draw_obstacles()
 	local tree = love.graphics.newQuad(0, 0, 20, 20, ingame.world_img)
 	local grass = love.graphics.newQuad(20, 0, 20, 20, ingame.world_img)
-	local scale = 3
 	local screen_w = love.graphics.getWidth()
 	local screen_h = love.graphics.getHeight()
 
@@ -116,7 +128,6 @@ local function draw_pick_up_tooltip()
 end
 
 local function draw_clues()
-	local square_size = 60
 	local screen_w = love.graphics.getWidth()
 	local screen_h = love.graphics.getHeight()
 
@@ -132,8 +143,55 @@ local function draw_clues()
 	end
 end
 
+local function draw_on_victory()
+	if ingame.game_state == "victory" then
+		draw_centered_text("Success, case closed successfully, the murderer was arrested.")
+	end
+end
+
+local function draw_notification_for_arrest_person()
+	local discovered_clues = ingame.clue_handler.get_discovered_summary()
+	local index = ingame.clue_summary_control.get_selected_index()
+	local screen_w = love.graphics.getWidth()
+	local screen_h = love.graphics.getHeight()
+
+	run_if_ready_to_arrest(function()
+		for i = math.floor(ingame.detective.x)-10, math.floor(ingame.detective.x)+10 do
+			for j = math.floor(ingame.detective.y)-10, math.floor(ingame.detective.y)+10 do
+				if ingame.obstacles[i] and ingame.obstacles[i][j] then
+					if ingame.obstacles[i][j] == "police_car" then
+						love.graphics.draw(ingame.mobile_phone_image, 
+							square_size*(i+1)-square_size*ingame.detective.x+screen_w/2, 
+							square_size*j-square_size*ingame.detective.y+screen_h/2, 
+						0, scale, scale, 10, 10)
+
+						love.graphics.draw(ingame.mobile_phone_image, 
+							square_size*(i-1)-square_size*ingame.detective.x+screen_w/2, 
+							square_size*j-square_size*ingame.detective.y+screen_h/2, 
+						0, scale, scale, 10, 10)
+
+						love.graphics.draw(ingame.mobile_phone_image, 
+							square_size*i-square_size*ingame.detective.x+screen_w/2, 
+							square_size*(j+1)-square_size*ingame.detective.y+screen_h/2, 
+						0, scale, scale, 10, 10)
+
+						love.graphics.draw(ingame.mobile_phone_image, 
+							square_size*i-square_size*ingame.detective.x+screen_w/2, 
+							square_size*(j-1)-square_size*ingame.detective.y+screen_h/2, 
+						0, scale, scale, 10, 10)
+						goto double_break
+					end
+				end
+			end
+		end
+		::double_break::
+		if ingame.at_police_car(ingame.detective.x, ingame.detective.y) then
+			draw_centered_text("Press space key to arrest this person")
+		end
+	end)
+end
+
 function ingame.draw()
-	local scale = 3
 	local screen_w = love.graphics.getWidth()
 	local screen_h = love.graphics.getHeight()
 
@@ -141,7 +199,7 @@ function ingame.draw()
 
 	draw_clues()
 
-	ingame.clue_summary_control.draw(ingame.dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
+	ingame.clue_summary_control.draw(ingame.generate_dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
 	 
 	-- draw the detective
 	love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*ingame.detective.facing_direction, scale, 10, 10) 
@@ -149,9 +207,11 @@ function ingame.draw()
 	draw_pick_up_tooltip()
 
 	draw_object_description()
+	draw_on_victory()
+	draw_notification_for_arrest_person()
 end
 
-function ingame.dicovered_clues_name_iterator()
+function ingame.generate_dicovered_clues_name_iterator()
 	local index = 0
 	local discovered_clues = ingame.clue_handler.get_discovered_summary()
 
@@ -167,6 +227,12 @@ function ingame.clue_summary_image_getter(image_name)
  	return ingame.clues_images[image_name]["image"]
 end 
 
+local function get_obstacle_for_position(x_pos, y_pos)
+	if ingame.obstacles[math.floor(x_pos+0.5)] then
+		return ingame.obstacles[math.floor(x_pos+0.5)][math.floor(y_pos+0.5)]
+	end
+end
+
 function ingame.update(delta_time, transition_to_menu_state)
 	if love.keyboard.isDown("escape") then
 		transition_to_menu_state()
@@ -180,6 +246,7 @@ function ingame.update(delta_time, transition_to_menu_state)
 
 	ingame.clue_handler.check_disable_description()
 	ingame.clue_summary_control.check_for_clue_clicked()
+	ingame.call_police_station_if_person_selected()
 end
 
 function move_player(delta_time)
@@ -265,8 +332,24 @@ function ingame.spawn_police_car(police_car)
 	ingame.obstacles[police_car.position.x][police_car.position.y] = "police_car"
 end
 
+function ingame.call_police_station_if_person_selected()
+	local discovered_clues = ingame.clue_handler.get_discovered_summary()
+	local index = ingame.clue_summary_control.get_selected_index()
 
--- if a person is clicked, then give the option to arrest them
+	run_if_ready_to_arrest(function()
+		if ingame.at_police_car(ingame.detective.x, ingame.detective.y) then
+			if discovered_clues[index].is_murderer then
+				if love.keyboard.isDown("space") then
+					ingame.game_state="victory"
+				end
+			end
+		end
+	end)
+end
 
+function ingame.at_police_car(det_x, det_y)
+	return get_obstacle_for_position(det_x+1, det_y) == "police_car" or get_obstacle_for_position(det_x-1, det_y) == "police_car" or
+			get_obstacle_for_position(det_x, det_y+1) == "police_car" or get_obstacle_for_position(det_x, det_y-1) == "police_car"
+end
 
 return ingame

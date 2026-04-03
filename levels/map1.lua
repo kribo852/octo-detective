@@ -1,11 +1,11 @@
 set_size {
-	size = 35
+	size = 20
 }
 set_detective {
-	position = {x = 1, y = 36},
+	position = {x = 1, y = 20},
 }
 set_police_car {
-	position = {x = -1, y = 35}
+	position = {x = -1, y = 19}
 }
 make_clue {
 	name = "ring",
@@ -35,7 +35,7 @@ make_clue {
 	image = "wallet.png",
 	description = "This wallet contains a photo of a couple, a credit card and an adress. The woman in the picture is the victim. The credit card belongs to the person name<victim>",
 	depends_on = one("victim"),
-	discovery_positions = { {25, 0} }
+	discovery_positions = { {19, 2} }
 }
 make_clue {
 	name="suspect",
@@ -50,11 +50,12 @@ make_clue {
 make_clue {
 	name = "name<murderer>",
 	type = "person",
+	is_murderer = true,
 	is_discovered = false,
-	carried = true,
+	carried = true, -- this is a little bit misleading, carried here means that the icon on the ground disappears, when the clue is discovered
 	image = "suspect.png",
 	description = "name<murderer> is the husband of the victim name<victim>, says the officer at the police station.",
 	depends_on = one("suspect"),
 	display_on_ground_image = "call_police_station.png",
-	discovery_positions = { {-2, 35},{0, 35},{-1, 34},{-1, 36} }
+	discovery_positions = { {-2, 19},{0, 19},{-1, 18},{-1, 20} }
 }
