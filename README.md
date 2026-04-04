@@ -52,7 +52,7 @@ that would be nice to have:
 * ~~Dismiss clue information with a button press~~
 * Clues that activate on a timer
 * More complicated level designs, with lakes, roads, and urban areas 
-* A name generator for optionally generating character names
+* ~~A name generator for optionally generating character names~~
 * ~~Ability to choose between levels~~
 * Many more levels
 
