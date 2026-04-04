@@ -42,17 +42,18 @@ The clues have among other proprties:
 There are some unimplemented features still, to make the game complete, and others 
 that would be nice to have:
 
-* Case closed, level complete, on the arrest of the correct person
+* ~~Case closed, level complete, on the arrest of the correct person~~
 * Cold case, on the arrest of the incorrect person
 * Animations
 * Assistants, Liz, Gary and Rufus the german shepherd, to help solve the case
 * A page in the menu, for the controls
 * Save the results from a level, so the game remembers completed maps
-* Navigate the summary menu
-* Dismiss clue information with a button press
+* ~~Navigate the clue summary menu~~
+* ~~Dismiss clue information with a button press~~
 * Clues that activate on a timer
 * More complicated level designs, with lakes, roads, and urban areas 
 * A name generator for optionally generating character names
+* ~~Ability to choose between levels~~
 * Many more levels
 
 
