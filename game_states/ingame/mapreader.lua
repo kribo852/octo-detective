@@ -31,6 +31,11 @@ end
 
 
 function mapreader.readfile(filename)
+	mapreader.clues = {} -- clear previous data
+	mapreader.size = nil
+	mapreader.detective = nil
+	mapreader.police_car = nil
+
 	loadfile (filename, "t", 
 		{
 			set_size=mapreader.set_size, 

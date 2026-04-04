@@ -8,6 +8,7 @@ local ingame = {
 	clues_images = {},
 	clue_handler = require "game_states.ingame.clue_handler",
 	clue_summary_control = require "game_states.ingame.clue_summary_control",
+	mouse_pointer = require "game_states.mouse_pointer"
 }
 
 local square_size = 60
@@ -27,13 +28,13 @@ function ingame.init()
 		end
 	end
 	ingame.clue_handler.set_get_player_position(function() return ingame.detective.x, ingame.detective.y end)
-	ingame.game_state = "ongoing"
+	ingame.game_phase = "ongoing"
 end
 
 function ingame.read_from_mapreader()
 	local mapreader = require "game_states.ingame.mapreader"
 
-	mapreader.readfile("levels/map1.lua")
+	mapreader.readfile(cur_level)
 
 	ingame.depends_on = mapreader.depends_on
 	ingame.size = mapreader.size
@@ -65,7 +66,7 @@ local function run_if_ready_to_arrest(func_to_run)
 	local index = ingame.clue_summary_control.get_selected_index()
 
 	if #discovered_clues > 0 and discovered_clues[index] and discovered_clues[index].type == "person" and 
-		ingame.game_state=="ongoing" then
+		ingame.game_phase=="ongoing" then
 			func_to_run()
 	end
 end
@@ -144,7 +145,7 @@ local function draw_clues()
 end
 
 local function draw_on_victory()
-	if ingame.game_state == "victory" then
+	if ingame.game_phase == "victory" then
 		draw_centered_text("Success, case closed successfully, the murderer was arrested.")
 	end
 end
@@ -209,6 +210,7 @@ function ingame.draw()
 	draw_object_description()
 	draw_on_victory()
 	draw_notification_for_arrest_person()
+	ingame.mouse_pointer.draw()
 end
 
 function ingame.generate_dicovered_clues_name_iterator()
@@ -338,9 +340,9 @@ function ingame.call_police_station_if_person_selected()
 
 	run_if_ready_to_arrest(function()
 		if ingame.at_police_car(ingame.detective.x, ingame.detective.y) then
-			if discovered_clues[index].is_murderer then
-				if love.keyboard.isDown("space") then
-					ingame.game_state="victory"
+			if love.keyboard.isDown("space") then
+				if discovered_clues[index].is_murderer then
+					ingame.game_phase="victory"
 				end
 			end
 		end
