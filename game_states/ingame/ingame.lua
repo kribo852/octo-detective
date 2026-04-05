@@ -8,10 +8,10 @@ local ingame = {
 	clues_images = {},
 	clue_handler = require "game_states.ingame.clue_handler",
 	clue_summary_control = require "game_states.ingame.clue_summary_control",
-	mouse_pointer = require "game_states.mouse_pointer"
+	mouse_pointer = require "game_states.mouse_pointer",
+	d_p_c = require "game_states.ingame.draw_position_calculator"
 }
 
-local square_size = 60
 local scale = 3
 
 function ingame.init()
@@ -74,32 +74,23 @@ end
 local function draw_obstacles()
 	local tree = love.graphics.newQuad(0, 0, 20, 20, ingame.world_img)
 	local grass = love.graphics.newQuad(20, 0, 20, 20, ingame.world_img)
-	local screen_w = love.graphics.getWidth()
-	local screen_h = love.graphics.getHeight()
 
 	-- for obstacles
 	for i = math.floor(ingame.detective.x)-10 , math.floor(ingame.detective.x)+10 do
 		for j = math.floor(ingame.detective.y)-10,math.floor(ingame.detective.y)+10 do
+			local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i, j, true)
 			if ingame.obstacles[i] and ingame.obstacles[i][j] then
+
 				if ingame.obstacles[i][j] == "police_car" then
-					love.graphics.draw(ingame.police_car_img,  
-					square_size*i-square_size*ingame.detective.x+screen_w/2, 
-					square_size*j-square_size*ingame.detective.y+screen_h/2, 
-					0, scale, scale, 10, 10)
+					love.graphics.draw(ingame.police_car_img,  draw_x, draw_y, 0, scale, scale, 10, 10)
 					-- orientation, scalex, scaley, origin_offset
 				else 
-					love.graphics.draw(ingame.world_img, tree, 
-					square_size*i-square_size*ingame.detective.x+screen_w/2, 
-					square_size*j-square_size*ingame.detective.y+screen_h/2, 
-					0, scale, scale, 10, 10)
+					love.graphics.draw(ingame.world_img, tree,  draw_x, draw_y, 0, scale, scale, 10, 10)
 					-- orientation, scalex, scaley, origin_offset
 				end
 			else
 				if (i*13+j*11)%19==0 then
-					love.graphics.draw(ingame.world_img, grass, 
-					square_size*i-square_size*ingame.detective.x+screen_w/2, 
-					square_size*j-square_size*ingame.detective.y+screen_h/2, 
-					0, scale, scale, 10, 10)
+					love.graphics.draw(ingame.world_img, grass,  draw_x, draw_y, 0, scale, scale, 10, 10)
 				end
 			end
 		end
@@ -136,11 +127,11 @@ local function draw_clues()
 
 	for _,position in ipairs(to_be_drawn_on_ground_clue_positions) do
 		local image = ingame.clues_images[position.name]["display_on_ground_image"] or ingame.clues_images[position.name]["image"]
-		local scale = square_size/image:getWidth()-- square images only
 		local origin = image:getWidth()/2
 
-		love.graphics.draw(image, screen_w/2-square_size*(ingame.detective.x-position.pos_x), 
-			screen_h/2-square_size*(ingame.detective.y-position.pos_y), 0, scale, scale, origin, origin)
+		local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, position.pos_x, position.pos_y, true)
+
+		love.graphics.draw(image, draw_x, draw_y, 0, scale, scale, origin, origin)
 	end
 end
 
@@ -161,25 +152,17 @@ local function draw_notification_for_arrest_person()
 			for j = math.floor(ingame.detective.y)-10, math.floor(ingame.detective.y)+10 do
 				if ingame.obstacles[i] and ingame.obstacles[i][j] then
 					if ingame.obstacles[i][j] == "police_car" then
-						love.graphics.draw(ingame.mobile_phone_image, 
-							square_size*(i+1)-square_size*ingame.detective.x+screen_w/2, 
-							square_size*j-square_size*ingame.detective.y+screen_h/2, 
-						0, scale, scale, 10, 10)
+						local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i+1, j, true)
+						love.graphics.draw(ingame.mobile_phone_image, draw_x, draw_y,  0, scale, scale, 10, 10)
 
-						love.graphics.draw(ingame.mobile_phone_image, 
-							square_size*(i-1)-square_size*ingame.detective.x+screen_w/2, 
-							square_size*j-square_size*ingame.detective.y+screen_h/2, 
-						0, scale, scale, 10, 10)
+						draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i-1, j, true)
+						love.graphics.draw(ingame.mobile_phone_image, draw_x, draw_y,  0, scale, scale, 10, 10)
 
-						love.graphics.draw(ingame.mobile_phone_image, 
-							square_size*i-square_size*ingame.detective.x+screen_w/2, 
-							square_size*(j+1)-square_size*ingame.detective.y+screen_h/2, 
-						0, scale, scale, 10, 10)
+						draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i, j+1, true)
+						love.graphics.draw(ingame.mobile_phone_image, draw_x, draw_y,  0, scale, scale, 10, 10)
 
-						love.graphics.draw(ingame.mobile_phone_image, 
-							square_size*i-square_size*ingame.detective.x+screen_w/2, 
-							square_size*(j-1)-square_size*ingame.detective.y+screen_h/2, 
-						0, scale, scale, 10, 10)
+						draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i, j-1, true)
+						love.graphics.draw(ingame.mobile_phone_image, draw_x, draw_y,  0, scale, scale, 10, 10)
 						goto double_break
 					end
 				end
@@ -190,6 +173,41 @@ local function draw_notification_for_arrest_person()
 			draw_centered_text("Press space key to arrest this person")
 		end
 	end)
+end
+
+local function draw_map_boundary()
+	local screen_w = love.graphics.getWidth()
+	local screen_h = love.graphics.getHeight()
+	prev_red, prev_green, prev_blue = love.graphics.getColor()
+
+	for i = math.floor(ingame.detective.x)-10, math.floor(ingame.detective.x)+10 do
+		for j = math.floor(ingame.detective.y)-10, math.floor(ingame.detective.y)+10 do
+
+			if (i+j)%2==0 then
+				love.graphics.setColor(0, 0, 1, 0.5)
+			else
+				love.graphics.setColor(1, 1, 1, 0.5)
+			end
+
+			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i, j)
+			local draw_x_end,draw_y_end = ingame.d_p_c.calc_end(ingame.detective.x, ingame.detective.y, i, j)
+
+			if i == 1 and j > 0 and j<=ingame.size then
+				love.graphics.line(draw_x_start, draw_y_start, draw_x_start, draw_y_end)
+			end
+			if i == ingame.size and j > 0 and j<=ingame.size then
+				love.graphics.line(draw_x_end, draw_y_start, draw_x_end, draw_y_end)
+			end
+
+			if j == 1 and i > 0 and i<=ingame.size then
+				love.graphics.line(draw_x_start, draw_y_start, draw_x_end, draw_y_start)
+			end
+			if j == ingame.size and i > 0 and i<=ingame.size then
+				love.graphics.line(draw_x_start, draw_y_end, draw_x_end, draw_y_end)
+			end
+		end
+	end
+	love.graphics.setColor(prev_red, prev_green, prev_blue)
 end
 
 function ingame.draw()
@@ -210,6 +228,7 @@ function ingame.draw()
 	draw_object_description()
 	draw_on_victory()
 	draw_notification_for_arrest_person()
+	draw_map_boundary()
 	ingame.mouse_pointer.draw()
 end
 

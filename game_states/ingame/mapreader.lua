@@ -35,6 +35,7 @@ function mapreader.readfile(filename)
 	mapreader.size = nil
 	mapreader.detective = nil
 	mapreader.police_car = nil
+	mapreader.name_generator.reset()
 
 	loadfile (filename, "t", 
 		{

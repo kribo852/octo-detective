@@ -1,5 +1,5 @@
 local name_generator = {
-	
+
 }
 
 function name_generator.make_person_name_function()
@@ -51,12 +51,16 @@ function name_generator.make_person_name_function()
 	end
 end
 
+function name_generator.reset()
+	name_generator.stored_names = {}
+end
+
 function name_generator.replace_token_with_name(token)
-	if not name_generator["name_"..token] then
-		name_generator["name_"..token] = name_generator.make_person_name_function()():gsub("^%l", string.upper)
+	if not name_generator.stored_names["name_"..token] then
+		name_generator.stored_names["name_"..token] = name_generator.make_person_name_function()():gsub("^%l", string.upper)
 	end
 
-	return name_generator["name_"..token]
+	return name_generator.stored_names["name_"..token]
 end
 
 
