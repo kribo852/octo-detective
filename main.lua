@@ -11,6 +11,7 @@ function love.load()
 	menu = require "game_states.menu"
 	ingame = require "game_states.ingame.ingame"
 	level_selector = require "game_states.ingame.level_selector"
+	debounce_keyboard = require "game_states.debounced_keyboard"
 
 	init_game_state_transitions()
 
@@ -23,14 +24,8 @@ function init_game_state_transitions()
 	game_state_engine.register_draw_arguments("menu", {})
 
 	game_state_engine.register_state("ingame", ingame.update, ingame.draw, ingame.init)
-	game_state_engine.register_update_arguments("ingame", {"to_menutransition_state"})
+	game_state_engine.register_update_arguments("ingame", {"to_menu_state"})
 	game_state_engine.register_draw_arguments("ingame", {})
-
-	local to_menu = require "game_states.between_states"
-
-	game_state_engine.register_state("transition_to_menu", to_menu.update, to_menu.draw)
-	game_state_engine.register_update_arguments("transition_to_menu", {"to_menu_state"})
-	game_state_engine.register_draw_arguments("transition_to_menu", {})
 
 	game_state_engine.register_state("level_selector", level_selector.update, level_selector.draw)
 	game_state_engine.register_update_arguments("level_selector", {"to_game_state"})
@@ -43,11 +38,11 @@ function love.update(delta_time)
 	game_state_engine.update(delta_time,
 		{
 		  to_game_state=to_game_state,
-		  to_menutransition_state=to_menutransition_state,
 		  to_menu_state=to_menu_state, 
 		  to_level_selector_state=to_level_selector_state
 		}
 	)
+	debounce_keyboard.update()
 end
 
 function love.draw()
@@ -56,10 +51,6 @@ end
 
 function to_game_state()
 	game_state_engine.set_next_state("ingame")
-end
-
-function to_menutransition_state()
-	game_state_engine.set_next_state("transition_to_menu")
 end
 
 function to_menu_state()

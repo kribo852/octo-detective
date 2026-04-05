@@ -255,13 +255,11 @@ local function get_obstacle_for_position(x_pos, y_pos)
 end
 
 function ingame.update(delta_time, transition_to_menu_state)
-	if love.keyboard.isDown("escape") then
+	if debounce_keyboard.check("escape") then
 		transition_to_menu_state()
 	end 
 
-	if love.keyboard.isDown("space") then
-		ingame.discover_action()
-	end
+	ingame.discover_action()
 
 	move_player(delta_time)
 
@@ -343,7 +341,7 @@ end
 
 function ingame.discover_action()
 	local tmp_clue = ingame.clue_handler.can_be_discovered()
-	if tmp_clue then
+	if tmp_clue and debounce_keyboard.check("space") then
 		ingame.clue_handler.discover_clue(tmp_clue)
 	end
 end
@@ -359,7 +357,7 @@ function ingame.call_police_station_if_person_selected()
 
 	run_if_ready_to_arrest(function()
 		if ingame.at_police_car(ingame.detective.x, ingame.detective.y) then
-			if love.keyboard.isDown("space") then
+			if debounce_keyboard.check("space") then
 				if discovered_clues[index].is_murderer then
 					ingame.game_phase="victory"
 				end

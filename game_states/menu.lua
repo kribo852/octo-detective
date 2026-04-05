@@ -10,7 +10,7 @@ function menu.draw()
 end
 
 function menu.update(delta_time, transition_to_forward_state)
-	if love.keyboard.isDown("escape") then
+	if debounce_keyboard.check("escape") then
 		love.event.quit(0)
 	end 
 	menu.clicked({minx=300, maxx=400, miny=300, maxy=320, click=function() love.event.quit(0) end})
