@@ -1,6 +1,5 @@
 local ingame = {
-	obstacles = {}, 
-	world_img = love.graphics.newImage("objects.png"), 
+	obstacles = {},  
 	detective_image = love.graphics.newImage("detective.png"),
 	police_car_img = love.graphics.newImage("police_car.png"),
 	mobile_phone_image = love.graphics.newImage("call_police_station.png"),
@@ -9,7 +8,8 @@ local ingame = {
 	clue_handler = require "game_states.ingame.clue_handler",
 	clue_summary_control = require "game_states.ingame.clue_summary_control",
 	mouse_pointer = require "game_states.mouse_pointer",
-	d_p_c = require "game_states.ingame.draw_position_calculator"
+	d_p_c = require "game_states.ingame.draw_position_calculator", 
+	image_handler = require "game_states.ingame.image_handler"
 }
 
 local scale = 3
@@ -25,7 +25,7 @@ function ingame.init()
 		for j=1,ingame.size do
 			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j) 
 				and love.math.random() < 0.15 then
-				ingame.obstacles[i][j] = "tree"
+				ingame.obstacles[i][j] = "tree"..love.math.random(4)
 			end
 		end
 	end
@@ -76,25 +76,16 @@ local function run_if_ready_to_arrest(func_to_run)
 end
 
 local function draw_obstacles()
-	local tree = love.graphics.newQuad(0, 0, 20, 20, ingame.world_img)
-	local grass = love.graphics.newQuad(20, 0, 20, 20, ingame.world_img)
-
 	-- for obstacles
 	for i = math.floor(ingame.detective.x)-10 , math.floor(ingame.detective.x)+10 do
 		for j = math.floor(ingame.detective.y)-10,math.floor(ingame.detective.y)+10 do
 			local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i, j, true)
 			if ingame.obstacles[i] and ingame.obstacles[i][j] then
-
-				if ingame.obstacles[i][j] == "police_car" then
-					love.graphics.draw(ingame.police_car_img,  draw_x, draw_y, 0, scale, scale, 10, 10)
+					love.graphics.draw(ingame.image_handler.world_img, ingame.image_handler[ingame.obstacles[i][j]] ,  draw_x, draw_y, 0, scale, scale, 10, 10)
 					-- orientation, scalex, scaley, origin_offset
-				else 
-					love.graphics.draw(ingame.world_img, tree,  draw_x, draw_y, 0, scale, scale, 10, 10)
-					-- orientation, scalex, scaley, origin_offset
-				end
 			else
 				if (i*13+j*11)%19==0 then
-					love.graphics.draw(ingame.world_img, grass,  draw_x, draw_y, 0, scale, scale, 10, 10)
+					love.graphics.draw(ingame.image_handler.world_img, ingame.image_handler.plants,  draw_x, draw_y, 0, scale, scale, 10, 10)
 				end
 			end
 		end
