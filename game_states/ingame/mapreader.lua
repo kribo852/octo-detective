@@ -2,6 +2,7 @@
 
 local mapreader = {
 	clues = {},
+	obstacles = {},
 	name_generator = require "name_generator"
 }
 
@@ -29,12 +30,16 @@ function mapreader.set_detective(detective)
 	mapreader.detective = detective
 end
 
+function mapreader.add_obstacle(obstacle)
+	table.insert(mapreader.obstacles, {type=obstacle.type, position={x=obstacle.position.x, y=obstacle.position.y}})
+end
+
 
 function mapreader.readfile(filename)
 	mapreader.clues = {} -- clear previous data
+	mapreader.obstacles = {}
 	mapreader.size = nil
 	mapreader.detective = nil
-	mapreader.police_car = nil
 	mapreader.name_generator.reset()
 
 	loadfile (filename, "t", 
@@ -42,7 +47,7 @@ function mapreader.readfile(filename)
 			set_size=mapreader.set_size, 
 			make_clue=mapreader.make_clue,
 			set_detective=mapreader.set_detective,
-			set_police_car=function(police_car) mapreader.police_car=police_car end,
+			add_obstacle=mapreader.add_obstacle,
 			none=mapreader.none_clues, 
 			one=mapreader.one_clues,
 			all=mapreader.all_clues

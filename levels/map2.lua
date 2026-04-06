@@ -4,6 +4,7 @@ set_size {
 set_detective {
 	position = {x = 1, y = 20},
 }
-set_police_car {
+add_obstacle {
+	type = "police_car",
 	position = {x = -1, y = 19}
 }
