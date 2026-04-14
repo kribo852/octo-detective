@@ -4,7 +4,7 @@ local ingame -- a hack to remember, had to declare the variables here, so that t
 
 function love.load()
 	love.graphics.setDefaultFilter("nearest")
-	love.graphics.setBackgroundColor( 0.03, 0.1, 0.05 )
+	love.graphics.setBackgroundColor( 0.0, 0.125, 0.075 )
 	love.window.setTitle("octo-detective")
 
 	game_state_engine = require "game_state_engine.game_state_engine"
@@ -12,6 +12,7 @@ function love.load()
 	ingame = require "game_states.ingame.ingame"
 	level_selector = require "game_states.ingame.level_selector"
 	debounce_keyboard = require "game_states.debounced_keyboard"
+	weather = require "weather"
 
 	init_game_state_transitions()
 
@@ -43,10 +44,12 @@ function love.update(delta_time)
 		}
 	)
 	debounce_keyboard.update()
+	weather.update()
 end
 
 function love.draw()
 	game_state_engine.draw({})
+	weather.draw()
 end
 
 function to_game_state()

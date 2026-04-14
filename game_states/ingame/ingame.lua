@@ -1,7 +1,6 @@
 local ingame = {
 	obstacles = {},  
 	detective_image = love.graphics.newImage("detective.png"),
-	police_car_img = love.graphics.newImage("police_car.png"),
 	mobile_phone_image = love.graphics.newImage("call_police_station.png"),
 	detective = {facing_direction=1},
 	clues_images = {},
@@ -21,7 +20,7 @@ function ingame.init()
 	ingame.read_from_mapreader()
 
 	for i=1,ingame.size do
-		ingame.obstacles[i] = ingame.obstacles[i] or {}
+		ingame.obstacles[i] = ingame.obstacles[i] or {} -- to not removed obstacles from map file
 		for j=1,ingame.size do
 			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j) 
 				and love.math.random() < 0.15 then

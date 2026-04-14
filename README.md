@@ -55,5 +55,6 @@ that would be nice to have:
 * ~~A name generator for optionally generating character names~~
 * ~~Ability to choose between levels~~
 * Many more levels
+* ~~Weather~~
 
 

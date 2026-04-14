@@ -9,7 +9,8 @@ local image_handler = {
 	tree4 = love.graphics.newQuad(60, 20, 20, 20, world_img),
 	boulder = love.graphics.newQuad(60, 0, 20, 20, world_img),
 	police_car = love.graphics.newQuad(40, 40, 20, 20, world_img),
-	plants = love.graphics.newQuad(20, 0, 20, 20, world_img)
+	plants = love.graphics.newQuad(20, 0, 20, 20, world_img),
+	grave = love.graphics.newQuad(20, 20, 20, 20, world_img)
 }
 
 return image_handler
