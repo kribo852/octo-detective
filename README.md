@@ -13,7 +13,10 @@ In menu: use the mouse start a new game or to exit the game. You can also exit t
 the escape key.  
 
 In game: control the detective with arrow keys up,down,left,right and use space to discover 
-clues (you will get a hint when a clue can be activated). Use escape to exit to the menu
+clues (you will get a hint when a clue can be activated). 
+Use the mouse to switch between clues in the summary, and in particular for selecting persons for arrestations, which are done at the police car.
+
+Use escape to exit to the menu
 
 ## Techniques used
 This project uses the Love 2D game engine, version 11.5
@@ -24,13 +27,14 @@ In the folder levels, there is an example of a script that generates a map/level
 This script is written in lua and represents the whole level.
 The idea is that the level file shall contain as much information as possible about the level, 
 so that there is a great freedom for level designers to create (with relative ease) their own crime mysteries.
+If you write your own level, be sure to name them map[number].lua and to put them in the correct folder. The numbers should be contigous.
 
 In the level script map1.lua we see the following: 
 * The level size
 * The starting positions of the player and the police car
 * Clues
   
-The clues have among other proprties:
+The clues have among other properties:
 * Postions where they can be activated
 * A delay time in seconds, when they can be activated
 * Depends on, an expression for which clues must have been discovered, in order for this clue to be discovered
@@ -46,7 +50,7 @@ that would be nice to have:
 * Cold case, on the arrest of the incorrect person
 * Animations
 * Assistants, Liz, Gary and Rufus the german shepherd, to help solve the case
-* A page in the menu, for the controls
+* ~~A page in the menu, for the controls~~
 * Save the results from a level, so the game remembers completed maps
 * ~~Navigate the clue summary menu~~
 * ~~Dismiss clue information with a button press~~

@@ -2,7 +2,7 @@ local weather = {}
 
 function weather.update() 
 	if #weather < 500 then
-		table.insert(weather, {x=love.math.random(love.graphics.getWidth()), y=0, angle=math.pi/2, speed=8})
+		table.insert(weather, {x=love.math.random(love.graphics.getWidth()), y=0, angle=math.pi/2, speed=4})
 	end 
 
 	for index,particle in ipairs(weather) do
@@ -15,11 +15,11 @@ function weather.update()
 	end
 
 	for index,particle in ipairs(weather) do
-		if love.math.random(35) == 1 then
+		if love.math.random(50) == 1 then
 			weather[index] = { x=particle.x, y=particle.y , angle=particle.angle, speed=-0.5 }
 		end
-		if love.math.random(5) == 1 and particle.speed < 0 then
-			weather[index] = { x=particle.x, y=0 , angle=particle.angle, speed=8 }
+		if love.math.random(4) == 1 and particle.speed < 0 then
+			weather[index] = { x=particle.x, y=0 , angle=particle.angle, speed=5 }
 		end
 	end
 
@@ -28,7 +28,7 @@ end
 
 function weather.draw()
 	local r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(0.1, 0.35, 0.5, 0.10)
+	love.graphics.setColor(0.1, 0.15, 0.2, 0.2)
 	local prev_line_width = love.graphics.getLineWidth()
 	love.graphics.setLineWidth(2)
 

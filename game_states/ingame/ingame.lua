@@ -1,6 +1,7 @@
 local ingame = {
 	obstacles = {},  
 	detective_image = love.graphics.newImage("detective.png"),
+	person_image = love.graphics.newImage("person.png"),
 	mobile_phone_image = love.graphics.newImage("call_police_station.png"),
 	detective = {facing_direction=1},
 	clues_images = {},
@@ -8,7 +9,8 @@ local ingame = {
 	clue_summary_control = require "game_states.ingame.clue_summary_control",
 	mouse_pointer = require "game_states.mouse_pointer",
 	d_p_c = require "game_states.ingame.draw_position_calculator", 
-	image_handler = require "game_states.ingame.image_handler"
+	image_handler = require "game_states.ingame.image_handler",
+	person_handler = require "game_states.ingame.person_handler"
 }
 
 local scale = 3
@@ -57,11 +59,17 @@ function ingame.read_from_mapreader()
 	ingame.detective.x = mapreader.detective.position.x
 	ingame.detective.y = mapreader.detective.position.y
 
+	ingame.compose_lookup(mapreader)
+	ingame.clue_handler.set_clues(clues)
+
+	ingame.person_handler.set_persons(mapreader.persons) 
+end
+
+function ingame.compose_lookup(mapreader)
 	for _,obstacle in ipairs(mapreader.obstacles) do
-		ingame.add_defined_obstacle(obstacle)
+		ingame.add_defined_obstacle_to_lookup(obstacle)
 	end
 
-	ingame.clue_handler.set_clues(clues)
 end
 
 local function run_if_ready_to_arrest(func_to_run)
@@ -71,6 +79,13 @@ local function run_if_ready_to_arrest(func_to_run)
 	if #discovered_clues > 0 and discovered_clues[index] and discovered_clues[index].type == "person" and 
 		ingame.game_phase=="ongoing" then
 			func_to_run()
+	end
+end
+
+local function draw_persons() 
+	for index,person in ipairs(ingame.person_handler.persons) do
+		local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, person.x, person.y, true)
+		love.graphics.draw(ingame.person_image, draw_x, draw_y, 0, scale, scale, 10, 10)
 	end
 end
 
@@ -141,7 +156,7 @@ local function draw_notification_for_arrest_person()
 	local screen_w = love.graphics.getWidth()
 	local screen_h = love.graphics.getHeight()
 
-	local around_func = ingame.make_around_function(ingame.obstacle_lookup, nil)
+	local around_func = ingame.make_around_function(ingame.obstacle_lookup)
 
 	run_if_ready_to_arrest(function()
 		for _,value in ipairs(around_func("police_car")) do
@@ -165,9 +180,9 @@ local function draw_map_boundary()
 		for j = math.floor(ingame.detective.y)-10, math.floor(ingame.detective.y)+10 do
 
 			if (i+j)%2==0 then
-				love.graphics.setColor(0, 0, 1, 0.5)
+				love.graphics.setColor(0, 0, 1, 0.75)
 			else
-				love.graphics.setColor(1, 1, 1, 0.5)
+				love.graphics.setColor(1, 1, 1, 0.75)
 			end
 
 			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i, j)
@@ -198,11 +213,10 @@ function ingame.draw()
 	draw_obstacles()
 
 	draw_clues()
-
-	ingame.clue_summary_control.draw(ingame.generate_dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
 	 
 	-- draw the detective
 	love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*ingame.detective.facing_direction, scale, 10, 10) 
+	draw_persons()
 
 	draw_pick_up_tooltip()
 
@@ -210,6 +224,7 @@ function ingame.draw()
 	draw_on_victory()
 	draw_notification_for_arrest_person()
 	draw_map_boundary()
+	ingame.clue_summary_control.draw(ingame.generate_dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
 	ingame.mouse_pointer.draw()
 end
 
@@ -247,6 +262,7 @@ function ingame.update(delta_time, transition_to_menu_state)
 	ingame.clue_handler.check_disable_description()
 	ingame.clue_summary_control.check_for_clue_clicked()
 	ingame.call_police_station_if_person_selected()
+	ingame.person_handler.move(delta_time, function(x_pos, y_pos) return ingame.obstacles[x_pos] and ingame.obstacles[x_pos][y_pos] end)
 end
 
 function move_player(delta_time)
@@ -327,12 +343,20 @@ function ingame.discover_action()
 	end
 end
 
-function ingame.add_defined_obstacle(obstacle)
+local function add_layer_to_lookup(prev_obstacle_lookup, match_name, position)
+	return function(name) 
+		if name == match_name then
+			return position
+		end
+		return prev_obstacle_lookup(name)
+	end
+end
+
+function ingame.add_defined_obstacle_to_lookup(obstacle)
 	ingame.obstacles[obstacle.position.x] = ingame.obstacles[obstacle.position.x] or {}
 	ingame.obstacles[obstacle.position.x][obstacle.position.y] = obstacle.type
 
-	ingame.obstacle_lookup = ingame.compose_obstacle_lookup(ingame.obstacle_lookup, obstacle.type,
-	{obstacle.position.x, obstacle.position.y})
+	ingame.obstacle_lookup = add_layer_to_lookup(ingame.obstacle_lookup, obstacle.type, {obstacle.position.x, obstacle.position.y})
 end
 
 function ingame.call_police_station_if_person_selected()
@@ -355,38 +379,24 @@ function ingame.at_police_car(det_x, det_y)
 			get_obstacle_for_position(det_x, det_y+1) == "police_car" or get_obstacle_for_position(det_x, det_y-1) == "police_car"
 end
 
-function ingame.make_around_function(obstacle_lookup, person_lookup)
+function ingame.make_around_function(...)
+
+	local func_lookups = {...}
 	
 	return function(name)
 
-		if obstacle_lookup then
-			local position = obstacle_lookup(name)
+		for index,lookup in ipairs(func_lookups) do
+			if lookup then
+				local position = lookup(name)
 
-			if position then
-				return {{position[1]+1, position[2]}, {position[1]-1, position[2]}, 
-				{position[1], position[2]+1}, {position[1], position[2]-1}}
-			end
-		end
-
-		if person_lookup then
-			local position = person_lookup(name)
-
-			if position then
-				return {{position[1]+1, position[2]}, {position[1]-1, position[2]}, 
-				{position[1], position[2]+1}, {position[1], position[2]-1}}
+				if position then
+					return {{position[1]+1, position[2]}, {position[1]-1, position[2]}, 
+					{position[1], position[2]+1}, {position[1], position[2]-1}}
+				end
 			end
 		end
 
 		return {}
-	end
-end
-
-function ingame.compose_obstacle_lookup(prev_obstacle_lookup, match_name, position)
-	return function(name) 
-		if name == match_name then
-			return position
-		end
-		return prev_obstacle_lookup(name)
 	end
 end
 
