@@ -36,3 +36,15 @@ make_clue {
 	depends_on = none(),
 	discovery_positions = { {20, 10} }
 }
+make_clue {
+	name = "name<witness>",
+	type = "person",
+	is_murderer = false,
+	is_discovered = false,
+	carried = true,
+	image = "person.png",
+	description = "This person name<witness> knew the disappeared person",
+	depends_on = none(),
+	display_on_ground_image = "blank_action.png",
+	discovery_around = around("name<witness>")
+}

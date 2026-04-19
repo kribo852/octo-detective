@@ -61,8 +61,8 @@ function ingame.read_from_mapreader()
 
 	ingame.compose_lookup(mapreader)
 	ingame.clue_handler.set_clues(clues)
-
-	ingame.person_handler.set_persons(mapreader.persons) 
+	ingame.person_handler.set_persons(mapreader.persons)
+	ingame.clue_handler.set_lookup_function(ingame.make_around_function(ingame.person_handler.get_person_lookup))
 end
 
 function ingame.compose_lookup(mapreader)

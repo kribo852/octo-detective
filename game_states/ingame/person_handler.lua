@@ -23,16 +23,24 @@ function person_handler.move(delta_time, obstacle_at_position_func)
 
 end
 
-function person_handler.add_person(position, behaviour)
-	table.insert(person_handler.persons, {x=position.x, y=position.y, behaviour=behaviour})
+function person_handler.add_person(position, behaviour, name)
+	table.insert(person_handler.persons, {x=position.x, y=position.y, behaviour=behaviour, name=name})
 end
 
 function person_handler.set_persons(persons)
 	person_handler.persons = {}
 	for _,person in ipairs(persons) do
-		person_handler.add_person(person.position, person.behaviour)
+		person_handler.add_person(person.position, person.behaviour, person.name)
 	end
 
+end
+
+function person_handler.get_person_lookup(name)
+	for _,person in ipairs(person_handler.persons) do
+		if person.name == name then
+			return {person.x, person.y}
+		end
+	end
 end
 
 function person_handler.make_move_func(behaviour, obstacle_at_position_func, x_pos, y_pos)

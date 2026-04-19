@@ -19,7 +19,8 @@ function mapreader.make_clue(clue)
 			description = mapreader.name_tokens(clue.description),
 			depends_on = clue.depends_on,
 			discovery_positions = clue.discovery_positions, -- discover at these positions
-			discovery_wait = clue.discovery_wait
+			discovery_wait = clue.discovery_wait,
+			discovery_around = clue.discovery_around
 	})
 end
 
@@ -39,6 +40,14 @@ function mapreader.add_person(person)
 	table.insert(mapreader.persons, {name=mapreader.name_tokens(person.name), type=person.type, behaviour=person.behaviour, position=person.position})--name, type, behaviour, position
 end
 
+function mapreader.around(name)
+	local lookup_name = mapreader.name_tokens(name)
+
+	return function(around_function) -- input is a lookup function that takes a name and returns the surrounding positions
+		return around_function(lookup_name)
+	end 
+end
+
 
 function mapreader.readfile(filename)
 	mapreader.clues = {} -- clear previous data
@@ -55,6 +64,7 @@ function mapreader.readfile(filename)
 			set_detective=mapreader.set_detective,
 			add_obstacle=mapreader.add_obstacle,
 			add_person=mapreader.add_person,
+			around=mapreader.around,
 			none=mapreader.none_clues, 
 			one=mapreader.one_clues,
 			all=mapreader.all_clues
@@ -108,4 +118,4 @@ function mapreader.name_tokens(name)
 	return string.gsub(name, token_box_pattern, mapreader.name_generator.replace_token_with_name)
 end
 
-return mapreader 
+return mapreader

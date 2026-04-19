@@ -10,6 +10,10 @@ function clue_handler.set_get_player_position(player_position_func)
 	clue_handler.player_position_func = player_position_func
 end
 
+function clue_handler.set_lookup_function(around_lookup_func)
+	clue_handler.around_lookup_func = around_lookup_func -- lookup_func(name) -½ position[]
+end
+
 function clue_handler.can_be_discovered()
 	if active_description_clue ~= nil then
 		return
@@ -21,22 +25,30 @@ function clue_handler.can_be_discovered()
 		detective_x, detective_y = clue_handler.player_position_func()
 
 		if (not clue.is_discovered) and clue_handler.clue_all_dependencies_met(clue, all_discovered_clues) then
-
-			if not clue.discovery_positions or next(clue.discovery_positions) == nil then
-				return true -- no action required to reveal the clue, therefore return true, the value is nil or {}
+			if clue.discovery_positions and next(clue.discovery_positions) then
+				if clue.discovery_positions then
+					for i,v in ipairs(clue.discovery_positions) do
+						if v[1] == detective_x and v[2] == detective_y then
+							return true
+						end
+					end
+				end
+				return false
 			end
-			-- other conditions here
-			if clue.discovery_positions then 
-				for i,v in ipairs(clue.discovery_positions) do
+
+			if clue.discovery_around then
+				for i,v in ipairs(clue.discovery_around(clue_handler.around_lookup_func)) do -- around_func(name) -½ positions[] 
 					if v[1] == detective_x and v[2] == detective_y then
 						return true
 					end
 				end
+				return false
 			end
 
+			return true -- no particular conditions apply for this clue to be discovered
 		end
 
-		return false 
+		return false
 	end
 
 	return clue_handler.match_one(matcher)
@@ -55,15 +67,23 @@ function clue_handler.is_visible_on_the_ground()
 	local matcher = 
 	function(clue) 
 		return (((not clue.is_discovered) and clue_handler.clue_all_dependencies_met(clue, all_discovered_clues))
-				or (clue.is_discovered and not clue.carried)) and clue.discovery_positions
+				or (clue.is_discovered and not clue.carried))
 	end
 
 	local clues_to_draw = clue_handler.find_all_matching(matcher)
 	local rtn_stripped_clue_information = {}
 
 	for _,value in ipairs(clues_to_draw) do
-		for __,position_value in ipairs(value.discovery_positions) do
-			table.insert(rtn_stripped_clue_information, {pos_x = position_value[1], pos_y = position_value[2], name=value.name })
+		if value.discovery_positions then
+			for _,position_value in ipairs(value.discovery_positions) do
+				table.insert(rtn_stripped_clue_information, {pos_x = position_value[1], pos_y = position_value[2], name=value.name })
+			end
+		end
+
+		if value.discovery_around then
+			for _,position_value in ipairs(value.discovery_around(clue_handler.around_lookup_func)) do
+				table.insert(rtn_stripped_clue_information, {pos_x = position_value[1], pos_y = position_value[2], name=value.name })
+			end
 		end
 	end
 	return rtn_stripped_clue_information
