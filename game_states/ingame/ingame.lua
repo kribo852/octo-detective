@@ -62,7 +62,7 @@ function ingame.read_from_mapreader()
 	ingame.compose_lookup(mapreader)
 	ingame.clue_handler.set_clues(clues)
 	ingame.person_handler.set_persons(mapreader.persons)
-	ingame.clue_handler.set_lookup_function(ingame.make_around_function(ingame.person_handler.get_person_lookup))
+	ingame.clue_handler.set_around_lookup_function(ingame.make_around_function(ingame.person_handler.get_person_lookup, ingame.obstacle_lookup))
 end
 
 function ingame.compose_lookup(mapreader)
@@ -165,7 +165,7 @@ local function draw_notification_for_arrest_person()
 			love.graphics.draw(ingame.mobile_phone_image, draw_x, draw_y,  0, scale, scale, 10, 10)
 		end
 
-		if ingame.at_police_car(ingame.detective.x, ingame.detective.y) then
+		if ingame.at_defined_obstacle("police_car") then
 			draw_centered_text("Press space key to arrest this person")
 		end
 	end)
@@ -364,7 +364,7 @@ function ingame.call_police_station_if_person_selected()
 	local index = ingame.clue_summary_control.get_selected_index()
 
 	run_if_ready_to_arrest(function()
-		if ingame.at_police_car(ingame.detective.x, ingame.detective.y) then
+		if ingame.at_defined_obstacle("police_car") then
 			if debounce_keyboard.check("space") then
 				if discovered_clues[index].is_murderer then
 					ingame.game_phase="victory"
@@ -374,9 +374,11 @@ function ingame.call_police_station_if_person_selected()
 	end)
 end
 
-function ingame.at_police_car(det_x, det_y)
-	return get_obstacle_for_position(det_x+1, det_y) == "police_car" or get_obstacle_for_position(det_x-1, det_y) == "police_car" or
-			get_obstacle_for_position(det_x, det_y+1) == "police_car" or get_obstacle_for_position(det_x, det_y-1) == "police_car"
+function ingame.at_defined_obstacle(obstacle)
+	local det_x, det_y = ingame.detective.x, ingame.detective.y
+	local obstacle_position = ingame.obstacle_lookup(obstacle)
+
+	return obstacle_position and math.abs(det_x - obstacle_position[1]) + math.abs(det_y - obstacle_position[2]) == 1 
 end
 
 function ingame.make_around_function(...)

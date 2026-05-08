@@ -17,7 +17,7 @@ function love.load()
 
 	init_game_state_transitions()
 
-	cur_level = "levels/map1.lua"
+	cur_level = ""
 end
 
 function init_game_state_transitions()

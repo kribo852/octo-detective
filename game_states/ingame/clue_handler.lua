@@ -10,8 +10,9 @@ function clue_handler.set_get_player_position(player_position_func)
 	clue_handler.player_position_func = player_position_func
 end
 
-function clue_handler.set_lookup_function(around_lookup_func)
-	clue_handler.around_lookup_func = around_lookup_func -- lookup_func(name) -½ position[]
+--The function is composed to take a name and return all positions around the object with the name
+function clue_handler.set_around_lookup_function(around_lookup_func)
+	clue_handler.around_lookup_func = around_lookup_func -- lookup_func(name) -> position[]
 end
 
 function clue_handler.can_be_discovered()
@@ -37,7 +38,7 @@ function clue_handler.can_be_discovered()
 			end
 
 			if clue.discovery_around then
-				for i,v in ipairs(clue.discovery_around(clue_handler.around_lookup_func)) do -- around_func(name) -½ positions[] 
+				for i,v in ipairs(clue.discovery_around(clue_handler.around_lookup_func)) do -- around_func(name) -> positions[] 
 					if v[1] == detective_x and v[2] == detective_y then
 						return true
 					end
