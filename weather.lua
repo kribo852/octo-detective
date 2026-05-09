@@ -2,13 +2,13 @@ local weather = {}
 
 function weather.update() 
 	if #weather < 500 then
-		table.insert(weather, {x=love.math.random(love.graphics.getWidth()), y=0, angle=math.pi/2, speed=4})
+		table.insert(weather, {x=love.math.random(window_initial_width), y=0, angle=math.pi/2, speed=4})
 	end 
 
 	for index,particle in ipairs(weather) do
 		weather[index] = { 
 							x=particle.x+particle.speed*math.cos(particle.angle), 
-							y=(particle.y+particle.speed*math.sin(particle.angle))%love.graphics.getHeight(),
+							y=(particle.y+particle.speed*math.sin(particle.angle))%window_initial_height,
 							angle=particle.angle,
 							speed=particle.speed
 						}
@@ -18,7 +18,7 @@ function weather.update()
 		if love.math.random(50) == 1 then
 			weather[index] = { x=particle.x, y=particle.y , angle=particle.angle, speed=-0.5 }
 		end
-		if love.math.random(4) == 1 and particle.speed < 0 then
+		if love.math.random(10) == 1 and particle.speed < 0 then
 			weather[index] = { x=particle.x, y=0 , angle=particle.angle, speed=5 }
 		end
 	end

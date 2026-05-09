@@ -3,6 +3,9 @@ local menu
 local ingame -- a hack to remember, had to declare the variables here, so that they are visible to all functions, but had to set the filter mode before images were loaded (at definition)
 
 function love.load()
+	love.mouse.setVisible(false)
+	window_initial_width = love.graphics.getWidth()
+	window_initial_height = love.graphics.getHeight()
 	love.graphics.setDefaultFilter("nearest")
 	love.graphics.setBackgroundColor( 0.0, 0.375, 0.250 )
 	love.window.setTitle("octo-detective")
@@ -54,6 +57,7 @@ function love.update(delta_time)
 end
 
 function love.draw()
+	love.graphics.scale(math.min(love.graphics.getWidth()/window_initial_width, love.graphics.getHeight()/window_initial_height))
 	game_state_engine.draw({})
 	weather.draw()
 end

@@ -107,7 +107,7 @@ local function draw_obstacles()
 end
 
 local function draw_centered_text(text)
-	love.graphics.printf(text, love.graphics.getWidth()/2, love.graphics.getHeight()/2, 300, "center", 0, 1.5, 1.5, 150)
+	love.graphics.printf(text, window_initial_width/2, window_initial_height/2, 300, "center", 0, 1.5, 1.5, 150)
 end
 
 local function draw_object_description() 
@@ -120,8 +120,8 @@ end
 
 local function draw_pick_up_tooltip() 
 	local tmp_clue = ingame.clue_handler.can_be_discovered()
-	local screen_w = love.graphics.getWidth()
-	local screen_h = love.graphics.getHeight()
+	local screen_w = window_initial_width
+	local screen_h = window_initial_height
 
 	if tmp_clue then
 		draw_centered_text("Use the space key to discover a clue")
@@ -129,8 +129,8 @@ local function draw_pick_up_tooltip()
 end
 
 local function draw_clues()
-	local screen_w = love.graphics.getWidth()
-	local screen_h = love.graphics.getHeight()
+	local screen_w = window_initial_width
+	local screen_h = window_initial_height
 
 	local to_be_drawn_on_ground_clue_positions = ingame.clue_handler.is_visible_on_the_ground()
 
@@ -153,8 +153,8 @@ end
 local function draw_notification_for_arrest_person()
 	local discovered_clues = ingame.clue_handler.get_discovered_summary()
 	local index = ingame.clue_summary_control.get_selected_index()
-	local screen_w = love.graphics.getWidth()
-	local screen_h = love.graphics.getHeight()
+	local screen_w = window_initial_width
+	local screen_h = window_initial_height
 
 	local around_func = ingame.make_around_function(ingame.obstacle_lookup)
 
@@ -172,8 +172,8 @@ local function draw_notification_for_arrest_person()
 end
 
 local function draw_map_boundary()
-	local screen_w = love.graphics.getWidth()
-	local screen_h = love.graphics.getHeight()
+	local screen_w = window_initial_width
+	local screen_h = window_initial_height
 	prev_red, prev_green, prev_blue = love.graphics.getColor()
 
 	for i = math.floor(ingame.detective.x)-10, math.floor(ingame.detective.x)+10 do
@@ -207,8 +207,8 @@ local function draw_map_boundary()
 end
 
 function ingame.draw()
-	local screen_w = love.graphics.getWidth()
-	local screen_h = love.graphics.getHeight()
+	local screen_w = window_initial_width
+	local screen_h = window_initial_height
 
 	draw_obstacles()
 
