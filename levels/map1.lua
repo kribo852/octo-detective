@@ -54,7 +54,7 @@ make_clue {
 	is_murderer = true,
 	is_discovered = false,
 	carried = true, -- this is a little bit misleading, carried here means that the icon on the ground disappears, when the clue is discovered
-	image = "suspect.png",
+	image = "portrait.png",
 	description = "name<murderer> is the husband of the victim name<victim>, says the officer at the police station.",
 	depends_on = one("suspect"),
 	display_on_ground_image = "call_police_station.png",

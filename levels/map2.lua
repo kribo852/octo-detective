@@ -114,3 +114,13 @@ make_clue {
 	depends_on = one("daughter"),
 	discovery_positions = { {20, 20} }
 }
+make_clue {
+	name="suspect",
+	type="criminal profile",
+	is_discovered = false,
+	carried = false,
+	image = "suspect.png",
+	description = "Hmm, name<disappeared> sees name<daughter> pick poisonous mushrooms, and then name<son> dies. name<disappeared> confronts name<daughter> with this and some time later he disappears. name<daughter> inherites the family fortune. It looks like I must make another call to the station",
+	depends_on = all("diary"),
+	discovery_wait = 10 --in seconds, this is not implemented
+}
