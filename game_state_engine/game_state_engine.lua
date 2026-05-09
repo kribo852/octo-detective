@@ -40,7 +40,7 @@ function game_state_engine.update(delta_time, argument_lookup_table)
 			game_state_engine[game_state_engine.state].teardown_func() --tear down
 		end
 		game_state_engine.state = game_state_engine.next_state
-		print("state"..game_state_engine.state)
+		print("new state "..game_state_engine.state)
 		game_state_engine[game_state_engine.state].load_func()--transition loading here
 	end	
 

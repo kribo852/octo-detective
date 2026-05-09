@@ -1,12 +1,16 @@
 local menu = {
-	mouse_pointer = require "game_states.mouse_pointer"
+	mouse_pointer = require "game_states.mouse_pointer",
+	meta_menu = require "game_states.meta_menu"
 }
 
 function menu.draw() 
-	love.graphics.print("Menu", 300, 100, 0, 1.5)
-	love.graphics.print("Start new game", 300, 200, 0, 1.5)
-	love.graphics.print("View controls", 300, 300, 0, 1.5)
-	love.graphics.print("Quit", 300, 400, 0, 1.5)
+	local menu_obj = menu.meta_menu.get_menu_layout({
+		{type = "text", value = "Menu"},
+		{type = "button", value = "Start a new investigation"},
+		{type = "button", value = "View controls"},
+		{type = "button", value = "Quit"}})
+
+	menu_obj.draw()
 	menu.mouse_pointer.draw()
 end
 
@@ -14,22 +18,15 @@ function menu.update(delta_time, transition_to_forward_state, transition_to_cont
 	if debounce_keyboard.check("escape") then
 		love.event.quit(0)
 	end 
-	menu.clicked({minx=300, maxx=400, miny=400, maxy=420, click=function() love.event.quit(0) end})
 
-	menu.clicked({minx=300, maxx=400, miny=200, maxy=220, click=function() transition_to_forward_state() end})
+	local menu_obj = menu.meta_menu.get_menu_layout({
+		{type = "text", value = "Menu"},
+		{type = "button", value = "Start a new investigation", action=function() transition_to_forward_state() end},
+		{type = "button", value = "View controls", action=function() transition_to_controls() end},
+		{type = "button", value = "Quit", action=function() love.event.quit(0) end}
+	})
 
-	menu.clicked({minx=300, maxx=400, miny=300, maxy=320, click=function() transition_to_controls() end})
-end
-
-function menu.clicked(button) 
-	if love.mouse.getX() > button.minx and
-	   love.mouse.getX() < button.maxx and
-	   love.mouse.getY() > button.miny and
-	   love.mouse.getY() < button.maxy then
-	   	if love.mouse.isDown(1) then
-	   		button.click()
-	   	end
-	end
+	menu_obj.update()
 end
 
 return menu
