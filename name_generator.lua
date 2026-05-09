@@ -3,9 +3,8 @@ local name_generator = {
 }
 
 function name_generator.make_person_name_function()
-	local length = 7
+	local length = love.math.random(4, 7)
 	local end_f = function(nam_gen_func, accumulated)
-		print(nam_gen_func)
 		if #accumulated >= length then 
 			return accumulated
 		end
@@ -47,7 +46,8 @@ function name_generator.make_person_name_function()
 			return end_f(v1, accumulated..consonants[love.math.random(1, #consonants)])
 		end
 
-		return c1("")
+		local initial_letter_selector = {c2, v2}
+		return initial_letter_selector[love.math.random(2)]("")
 	end
 end
 
