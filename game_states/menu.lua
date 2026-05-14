@@ -1,6 +1,7 @@
 local menu = {
 	mouse_pointer = require "game_states.mouse_pointer",
-	meta_menu = require "game_states.meta_menu"
+	meta_menu = require "game_states.meta_menu",
+	theme_handler = require "theme_handler"
 }
 
 function menu.draw() 
@@ -17,7 +18,9 @@ end
 function menu.update(delta_time, transition_to_forward_state, transition_to_controls)
 	if debounce_keyboard.check("escape") then
 		love.event.quit(0)
-	end 
+	end
+
+	menu.theme_handler.play()
 
 	local menu_obj = menu.meta_menu.get_menu_layout({
 		{type = "text", value = "Menu"},

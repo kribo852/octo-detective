@@ -61,4 +61,12 @@ that would be nice to have:
 * Many more levels
 * ~~Weather~~
 
+## Third party assets
+The music in this project (found in the assets folder) is not made or owned by me, but from the website:
+https://www.nihilore.com/
+Made by the musician JAY OPIE
 
+It is published under the Creative Commons Attribution 4.0 license, see:
+https://creativecommons.org/licenses/by/4.0/ 
+
+ 
