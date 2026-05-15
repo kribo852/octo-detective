@@ -36,7 +36,7 @@ function init_game_state_transitions()
 	game_state_engine.register_update_arguments("ingame", {"to_menu_state"})
 	game_state_engine.register_draw_arguments("ingame", {})
 
-	game_state_engine.register_state("level_selector", level_selector.update, level_selector.draw)
+	game_state_engine.register_state("level_selector", level_selector.update, level_selector.draw, nil, level_selector.tear_down)
 	game_state_engine.register_update_arguments("level_selector", {"to_game_state"})
 	game_state_engine.register_draw_arguments("level_selector", {})
 

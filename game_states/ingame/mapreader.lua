@@ -57,7 +57,7 @@ function mapreader.readfile(filename)
 	mapreader.detective = nil
 	mapreader.name_generator.reset()
 
-	loadfile (filename, "t", 
+	loadfile ("levels/"..filename, "t", 
 		{
 			set_size=mapreader.set_size, 
 			make_clue=mapreader.make_clue,

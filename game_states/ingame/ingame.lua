@@ -10,7 +10,8 @@ local ingame = {
 	mouse_pointer = require "game_states.mouse_pointer",
 	d_p_c = require "game_states.ingame.draw_position_calculator", 
 	image_handler = require "game_states.ingame.image_handler",
-	person_handler = require "game_states.ingame.person_handler"
+	person_handler = require "game_states.ingame.person_handler",
+	level_saver = require "level_saver"
 }
 
 local scale = 3
@@ -144,9 +145,12 @@ local function draw_clues()
 	end
 end
 
-local function draw_on_victory()
+local function draw_on_victory_or_loss()
 	if ingame.game_phase == "victory" then
 		draw_centered_text("Success, case closed successfully, the murderer was arrested.")
+	end
+	if ingame.game_phase == "cold case" then
+		draw_centered_text("Failure, the wrong person was arrested and the case went cold.")
 	end
 end
 
@@ -221,7 +225,7 @@ function ingame.draw()
 	draw_pick_up_tooltip()
 
 	draw_object_description()
-	draw_on_victory()
+	draw_on_victory_or_loss()
 	draw_notification_for_arrest_person()
 	draw_map_boundary()
 	ingame.clue_summary_control.draw(ingame.generate_dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
@@ -368,6 +372,10 @@ function ingame.call_police_station_if_person_selected()
 			if debounce_keyboard.check("space") then
 				if discovered_clues[index].is_murderer then
 					ingame.game_phase="victory"
+					ingame.level_saver.save(cur_level, "Case completed")
+				else
+					ingame.game_phase="cold case"
+					ingame.level_saver.save(cur_level, "Cold case")
 				end
 			end
 		end
