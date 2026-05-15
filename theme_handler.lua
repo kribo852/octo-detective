@@ -5,7 +5,7 @@ function theme_handler.play()
 		return
 	end
 
-	theme_handler.audio_source = love.audio.newSource("assets/Bones.mp3", "stream")
+	theme_handler.audio_source = love.audio.newSource("third_party_assets/Bones.mp3", "stream")
 	theme_handler.audio_source:setVolume(0.25)
 
 	love.audio.play(theme_handler.audio_source)
