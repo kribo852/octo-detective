@@ -3,10 +3,9 @@ local level_saver = {}
 local function load_from_directory(level_completion_file_name)
 	local string_contents = love.filesystem.read(level_completion_file_name)
 	if string_contents then
-		local contents = loadstring(string_contents)()
-		return contents 
+		return loadstring(string_contents, nil , "t", {})()
 	end
-	return {state="not finished"}
+	return {state="Open case"}
 end
 
 function level_saver.save(level_file_name, state)
