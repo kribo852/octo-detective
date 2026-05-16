@@ -31,7 +31,12 @@ function ingame.init()
 			end
 		end
 	end
-	ingame.clue_handler.set_get_player_position(function() return ingame.detective.x, ingame.detective.y end)
+	ingame.clue_handler.set_get_player_position(
+		function() 
+			local detective = ingame.person_handler.get_person_lookup("Detective")
+			return detective[1], detective[2]
+			end
+	) -- refactor this later, it is more obvious to use a dictionary
 	ingame.game_phase = "ongoing"
 end
 
@@ -57,9 +62,6 @@ function ingame.read_from_mapreader()
 		clues[mapreader.clues[i].name] = mapreader.clues[i]
 	end
 
-	ingame.detective.x = mapreader.detective.position.x
-	ingame.detective.y = mapreader.detective.position.y
-
 	ingame.compose_lookup(mapreader)
 	ingame.clue_handler.set_clues(clues)
 	ingame.person_handler.set_persons(mapreader.persons)
@@ -70,7 +72,12 @@ function ingame.compose_lookup(mapreader)
 	for _,obstacle in ipairs(mapreader.obstacles) do
 		ingame.add_defined_obstacle_to_lookup(obstacle)
 	end
+end
 
+local function get_detective()
+	local detective_lookup_data = ingame.person_handler.get_person_lookup("Detective")
+
+	return {x=detective_lookup_data[1], y=detective_lookup_data[2]}
 end
 
 local function run_if_ready_to_arrest(func_to_run)
@@ -85,16 +92,21 @@ end
 
 local function draw_persons() 
 	for index,person in ipairs(ingame.person_handler.persons) do
-		local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, person.x, person.y, true)
-		love.graphics.draw(ingame.person_image, draw_x, draw_y, 0, scale, scale, 10, 10)
+		local draw_x,draw_y = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, person.x, person.y, true)
+		if person.type == "person" then
+			love.graphics.draw(ingame.person_image, draw_x, draw_y, 0, scale*person.facing, scale, 10, 10)
+		end
+		if person.type == "detective" then
+			love.graphics.draw(ingame.detective_image, draw_x, draw_y, 0, scale*person.facing, scale, 10, 10)
+		end
 	end
 end
 
 local function draw_obstacles()
 	-- for obstacles
-	for i = math.floor(ingame.detective.x)-10 , math.floor(ingame.detective.x)+10 do
-		for j = math.floor(ingame.detective.y)-10,math.floor(ingame.detective.y)+10 do
-			local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i, j, true)
+	for i = math.floor(get_detective().x)-10 , math.floor(get_detective().x)+10 do
+		for j = math.floor(get_detective().y)-10,math.floor(get_detective().y)+10 do
+			local draw_x,draw_y = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, i, j, true)
 			if ingame.obstacles[i] and ingame.obstacles[i][j] then
 					love.graphics.draw(ingame.image_handler.world_img, ingame.image_handler[ingame.obstacles[i][j]] ,  draw_x, draw_y, 0, scale, scale, 10, 10)
 					-- orientation, scalex, scaley, origin_offset
@@ -139,7 +151,7 @@ local function draw_clues()
 		local image = ingame.clues_images[position.name]["display_on_ground_image"] or ingame.clues_images[position.name]["image"]
 		local origin = image:getWidth()/2
 
-		local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, position.pos_x, position.pos_y, true)
+		local draw_x,draw_y = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, position.pos_x, position.pos_y, true)
 
 		love.graphics.draw(image, draw_x, draw_y, 0, scale, scale, origin, origin)
 	end
@@ -164,7 +176,7 @@ local function draw_notification_for_arrest_person()
 
 	run_if_ready_to_arrest(function()
 		for _,value in ipairs(around_func("police_car")) do
-			local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, value[1], value[2], true)
+			local draw_x,draw_y = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, value[1], value[2], true)
 
 			love.graphics.draw(ingame.mobile_phone_image, draw_x, draw_y,  0, scale, scale, 10, 10)
 		end
@@ -180,8 +192,8 @@ local function draw_map_boundary()
 	local screen_h = window_initial_height
 	prev_red, prev_green, prev_blue = love.graphics.getColor()
 
-	for i = math.floor(ingame.detective.x)-10, math.floor(ingame.detective.x)+10 do
-		for j = math.floor(ingame.detective.y)-10, math.floor(ingame.detective.y)+10 do
+	for i = math.floor(get_detective().x)-10, math.floor(get_detective().x)+10 do
+		for j = math.floor(get_detective().y)-10, math.floor(get_detective().y)+10 do
 
 			if (i+j)%2==0 then
 				love.graphics.setColor(0, 0, 1, 0.75)
@@ -189,8 +201,8 @@ local function draw_map_boundary()
 				love.graphics.setColor(1, 1, 1, 0.75)
 			end
 
-			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(ingame.detective.x, ingame.detective.y, i, j)
-			local draw_x_end,draw_y_end = ingame.d_p_c.calc_end(ingame.detective.x, ingame.detective.y, i, j)
+			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, i, j)
+			local draw_x_end,draw_y_end = ingame.d_p_c.calc_end(get_detective().x, get_detective().y, i, j)
 
 			if i == 1 and j > 0 and j<=ingame.size then
 				love.graphics.line(draw_x_start, draw_y_start, draw_x_start, draw_y_end)
@@ -219,7 +231,7 @@ function ingame.draw()
 	draw_clues()
 	 
 	-- draw the detective
-	love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*ingame.detective.facing_direction, scale, 10, 10) 
+	--love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*get_detective().facing_direction, scale, 10, 10) 
 	draw_persons()
 
 	draw_pick_up_tooltip()
@@ -261,83 +273,12 @@ function ingame.update(delta_time, transition_to_menu_state)
 
 	ingame.discover_action()
 
-	move_player(delta_time)
+	--move_player(delta_time)
 
 	ingame.clue_handler.check_disable_description()
 	ingame.clue_summary_control.check_for_clue_clicked()
 	ingame.call_police_station_if_person_selected()
 	ingame.person_handler.move(delta_time, function(x_pos, y_pos) return ingame.obstacles[x_pos] and ingame.obstacles[x_pos][y_pos] end)
-end
-
-function move_player(delta_time)
-
-	if ingame.detective.move_function then
-		local xdir, ydir = ingame.detective.move_function(delta_time)
-
-		if math.abs(xdir) > 0 then
-			ingame.detective.facing_direction = -xdir/math.abs(xdir)
-		end
-
-		if xdir == 0 and ydir == 0 then
-			ingame.detective.move_function = nil
-			ingame.detective.x = math.floor(ingame.detective.x + 0.5)
-			ingame.detective.y = math.floor(ingame.detective.y + 0.5)
-		else
-			ingame.detective.x = ingame.detective.x + xdir
-			ingame.detective.y = ingame.detective.y + ydir
-		end
-	end
-
-
-	if ingame.detective.move_function then
-		return
-	end
-
-
-	local sum_x_move = 0
-	local sum_y_move = 0
-
-	if love.keyboard.isDown("up") then
-		sum_y_move = sum_y_move - 1
-	end
-
-	if love.keyboard.isDown("down") then
-		sum_y_move = sum_y_move + 1
-	end
-
-	if love.keyboard.isDown("left") then
-		sum_x_move = sum_x_move - 1
-	end
-
-	if love.keyboard.isDown("right") then
-		sum_x_move = sum_x_move + 1
-	end
-
-	ingame.detective.move_function = make_move_function(sum_x_move, sum_y_move, ingame.detective.x, ingame.detective.y)
-end
-
-function make_move_function(xdir, ydir, x_pos, y_pos)
-
-	if xdir == 0 and ydir == 0 then
-		return function() return 0, 0 end
-	end
-
-	if ingame.obstacles[x_pos+xdir] and ingame.obstacles[x_pos+xdir][y_pos+ydir] then
-		return function() return 0, 0 end 
-	end
-
-	local distance_to_travel = math.sqrt(xdir^2 + ydir^2)
-	local traveled = 0
-
-	return function(delta_time)
-		if traveled > distance_to_travel then
-			return 0, 0
-		end
-		local travel_part = 2 * delta_time -- here speed can be adjusted
-		traveled = traveled + travel_part
-
-		return (xdir*travel_part)/distance_to_travel, (ydir*travel_part)/distance_to_travel
-	end
 end
 
 function ingame.discover_action()
@@ -383,10 +324,10 @@ function ingame.call_police_station_if_person_selected()
 end
 
 function ingame.at_defined_obstacle(obstacle)
-	local det_x, det_y = ingame.detective.x, ingame.detective.y
+	local detective = get_detective()
 	local obstacle_position = ingame.obstacle_lookup(obstacle)
 
-	return obstacle_position and math.abs(det_x - obstacle_position[1]) + math.abs(det_y - obstacle_position[2]) == 1 
+	return obstacle_position and math.abs(detective.x - obstacle_position[1]) + math.abs(detective.y - obstacle_position[2]) == 1 
 end
 
 function ingame.make_around_function(...)

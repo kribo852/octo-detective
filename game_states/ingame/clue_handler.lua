@@ -28,6 +28,7 @@ function clue_handler.can_be_discovered()
 		if (not clue.is_discovered) and clue_handler.clue_all_dependencies_met(clue, all_discovered_clues) then
 			if clue.discovery_positions and next(clue.discovery_positions) then
 				if clue.discovery_positions then
+					--print("detective_x: "..detective_x.." detective_y: "..detective_y)
 					for i,v in ipairs(clue.discovery_positions) do
 						if v[1] == detective_x and v[2] == detective_y then
 							return true

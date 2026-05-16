@@ -29,7 +29,7 @@ function mapreader.set_size(size_table)
 end
 
 function mapreader.set_detective(detective)
-	mapreader.detective = detective
+	mapreader.add_person({name = "Detective", type = "detective", behaviour = "player", position = detective.position})
 end
 
 function mapreader.add_obstacle(obstacle)
@@ -54,7 +54,6 @@ function mapreader.readfile(filename)
 	mapreader.obstacles = {}
 	mapreader.persons = {}
 	mapreader.size = nil
-	mapreader.detective = nil
 	mapreader.name_generator.reset()
 
 	loadfile ("levels/"..filename, "t", 

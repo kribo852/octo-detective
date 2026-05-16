@@ -6,8 +6,8 @@ function game_state_engine.init(initialstate)
 end
 
 function game_state_engine.register_state(state, update_func, draw_func, load_func, teardown_func) -- load or teardown?
-	load_func = load_func or function() end
-	teardown_func = teardown_func or function() end
+	local load_func = load_func or function() end
+	local teardown_func = teardown_func or function() end
 
 	game_state_engine[state] = {update_func = update_func, draw_func = draw_func, load_func=load_func, teardown_func=teardown_func}
 end
@@ -36,14 +36,13 @@ delta time, and then the correct arguments
 ]=]
 function game_state_engine.update(delta_time, argument_lookup_table)
 	if game_state_engine.state ~= game_state_engine.next_state then
-		if(game_state_engine[game_state_engine.state] and game_state_engine[game_state_engine.state].teardown_func) then
+		if(game_state_engine[game_state_engine.state]) then -- needed for the initial state
 			game_state_engine[game_state_engine.state].teardown_func() --tear down
 		end
 		game_state_engine.state = game_state_engine.next_state
 		print("new state "..game_state_engine.state)
 		game_state_engine[game_state_engine.state].load_func()--transition loading here
-	end	
-
+	end
 
 	local curr_state = game_state_engine.state
 
