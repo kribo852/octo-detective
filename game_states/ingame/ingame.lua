@@ -65,6 +65,7 @@ function ingame.read_from_mapreader()
 	ingame.compose_lookup(mapreader)
 	ingame.clue_handler.set_clues(clues)
 	ingame.person_handler.set_persons(mapreader.persons)
+	ingame.person_handler.set_map_size(ingame.size)
 	ingame.clue_handler.set_around_lookup_function(ingame.make_around_function(ingame.person_handler.get_person_lookup, ingame.obstacle_lookup))
 end
 
@@ -103,10 +104,12 @@ local function draw_persons()
 end
 
 local function draw_obstacles()
+	local detective = get_detective()
+
 	-- for obstacles
-	for i = math.floor(get_detective().x)-10 , math.floor(get_detective().x)+10 do
-		for j = math.floor(get_detective().y)-10,math.floor(get_detective().y)+10 do
-			local draw_x,draw_y = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, i, j, true)
+	for i = math.floor(detective.x)-10 , math.floor(detective.x)+10 do
+		for j = math.floor(detective.y)-10,math.floor(detective.y)+10 do
+			local draw_x,draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j, true)
 			if ingame.obstacles[i] and ingame.obstacles[i][j] then
 					love.graphics.draw(ingame.image_handler.world_img, ingame.image_handler[ingame.obstacles[i][j]] ,  draw_x, draw_y, 0, scale, scale, 10, 10)
 					-- orientation, scalex, scaley, origin_offset
@@ -133,8 +136,6 @@ end
 
 local function draw_pick_up_tooltip() 
 	local tmp_clue = ingame.clue_handler.can_be_discovered()
-	local screen_w = window_initial_width
-	local screen_h = window_initial_height
 
 	if tmp_clue then
 		draw_centered_text("Use the space key to discover a clue")
@@ -142,9 +143,6 @@ local function draw_pick_up_tooltip()
 end
 
 local function draw_clues()
-	local screen_w = window_initial_width
-	local screen_h = window_initial_height
-
 	local to_be_drawn_on_ground_clue_positions = ingame.clue_handler.is_visible_on_the_ground()
 
 	for _,position in ipairs(to_be_drawn_on_ground_clue_positions) do
@@ -169,8 +167,6 @@ end
 local function draw_notification_for_arrest_person()
 	local discovered_clues = ingame.clue_handler.get_discovered_summary()
 	local index = ingame.clue_summary_control.get_selected_index()
-	local screen_w = window_initial_width
-	local screen_h = window_initial_height
 
 	local around_func = ingame.make_around_function(ingame.obstacle_lookup)
 
@@ -188,12 +184,11 @@ local function draw_notification_for_arrest_person()
 end
 
 local function draw_map_boundary()
-	local screen_w = window_initial_width
-	local screen_h = window_initial_height
+	local detective = get_detective()
 	prev_red, prev_green, prev_blue = love.graphics.getColor()
 
-	for i = math.floor(get_detective().x)-10, math.floor(get_detective().x)+10 do
-		for j = math.floor(get_detective().y)-10, math.floor(get_detective().y)+10 do
+	for i = math.floor(detective.x)-10, math.floor(detective.x)+10 do
+		for j = math.floor(detective.y)-10, math.floor(detective.y)+10 do
 
 			if (i+j)%2==0 then
 				love.graphics.setColor(0, 0, 1, 0.75)
@@ -201,8 +196,8 @@ local function draw_map_boundary()
 				love.graphics.setColor(1, 1, 1, 0.75)
 			end
 
-			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, i, j)
-			local draw_x_end,draw_y_end = ingame.d_p_c.calc_end(get_detective().x, get_detective().y, i, j)
+			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
+			local draw_x_end,draw_y_end = ingame.d_p_c.calc_end(detective.x, detective.y, i, j)
 
 			if i == 1 and j > 0 and j<=ingame.size then
 				love.graphics.line(draw_x_start, draw_y_start, draw_x_start, draw_y_end)
@@ -223,19 +218,10 @@ local function draw_map_boundary()
 end
 
 function ingame.draw()
-	local screen_w = window_initial_width
-	local screen_h = window_initial_height
-
 	draw_obstacles()
-
-	draw_clues()
-	 
-	-- draw the detective
-	--love.graphics.draw(ingame.detective_image, screen_w/2, screen_h/2, 0, scale*get_detective().facing_direction, scale, 10, 10) 
+	draw_clues()	 
 	draw_persons()
-
 	draw_pick_up_tooltip()
-
 	draw_object_description()
 	draw_on_victory_or_loss()
 	draw_notification_for_arrest_person()
