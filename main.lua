@@ -6,7 +6,6 @@ local function init_graphics()
 	window_initial_width = love.graphics.getWidth()
 	window_initial_height = love.graphics.getHeight()
 	love.graphics.setDefaultFilter("nearest")
-	love.graphics.setBackgroundColor(0.0, 0.375, 0.250)
 	love.window.setTitle("octo-detective")
 end
 
@@ -19,7 +18,6 @@ function love.load()
 	ingame = require "game_states.ingame.ingame"
 	level_selector = require "game_states.ingame.level_selector"
 	debounce_keyboard = require "game_states.debounced_keyboard"
-	weather = require "weather"
 	menu_view_controls = require "game_states.menu_view_controls"
 
 	init_game_state_transitions()
@@ -57,13 +55,11 @@ function love.update(delta_time)
 		}
 	)
 	debounce_keyboard.update()
-	weather.update()
 end
 
 function love.draw()
 	love.graphics.scale(math.min(love.graphics.getWidth()/window_initial_width, love.graphics.getHeight()/window_initial_height))
 	game_state_engine.draw({})
-	weather.draw()
 end
 
 function to_game_state()

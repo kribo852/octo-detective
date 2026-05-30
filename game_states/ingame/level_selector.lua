@@ -37,8 +37,6 @@ end
 
 
 function level_selector.draw()
-	level_selector.mouse_pointer.draw()
-
 	local level_meta_data = {}
 
 	if not level_selector.level_states then
@@ -53,6 +51,7 @@ function level_selector.draw()
 	end
 	local menu_obj = level_selector.meta_menu.get_menu_layout(level_meta_data)
 	menu_obj.draw()
+	level_selector.mouse_pointer.draw()
 end
 
 function level_selector.tear_down()

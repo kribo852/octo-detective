@@ -4,7 +4,7 @@ local menu = {
 	theme_handler = require "theme_handler"
 }
 
-function menu.draw() 
+function menu.draw()
 	local menu_obj = menu.meta_menu.get_menu_layout({
 		{type = "text", value = "Menu"},
 		{type = "button", value = "Start a new investigation"},
@@ -20,7 +20,7 @@ function menu.update(delta_time, transition_to_forward_state, transition_to_cont
 		love.event.quit(0)
 	end
 
-	menu.theme_handler.play()
+	menu.theme_handler.play("opening")
 
 	local menu_obj = menu.meta_menu.get_menu_layout({
 		{type = "text", value = "Menu"},

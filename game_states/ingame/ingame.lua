@@ -11,7 +11,9 @@ local ingame = {
 	d_p_c = require "game_states.ingame.draw_position_calculator", 
 	image_handler = require "game_states.ingame.image_handler",
 	person_handler = require "game_states.ingame.person_handler",
-	level_saver = require "level_saver"
+	level_saver = require "level_saver",
+	theme_handler = require "theme_handler",
+	weather = require "weather"
 }
 
 local scale = 3
@@ -218,15 +220,22 @@ local function draw_map_boundary()
 end
 
 function ingame.draw()
+	local bg_red, bg_green, bg_blue, bg_alpha = love.graphics.getColor()
+	love.graphics.setColor(0.0, 0.375, 0.250)
+	love.graphics.rectangle("fill", 0, 0, window_initial_width, window_initial_height)--this is the background
+	love.graphics.setColor(bg_red, bg_green, bg_blue, bg_alpha)
 	draw_obstacles()
 	draw_clues()	 
 	draw_persons()
+	
+	draw_map_boundary()
+	
 	draw_pick_up_tooltip()
 	draw_object_description()
 	draw_on_victory_or_loss()
 	draw_notification_for_arrest_person()
-	draw_map_boundary()
 	ingame.clue_summary_control.draw(ingame.generate_dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
+	ingame.weather.draw()
 	ingame.mouse_pointer.draw()
 end
 
@@ -265,6 +274,7 @@ function ingame.update(delta_time, transition_to_menu_state)
 	ingame.clue_summary_control.check_for_clue_clicked()
 	ingame.call_police_station_if_person_selected()
 	ingame.person_handler.move(delta_time, function(x_pos, y_pos) return ingame.obstacles[x_pos] and ingame.obstacles[x_pos][y_pos] end)
+	ingame.weather.update()
 end
 
 function ingame.discover_action()
@@ -300,6 +310,7 @@ function ingame.call_police_station_if_person_selected()
 				if discovered_clues[index].is_murderer then
 					ingame.game_phase="victory"
 					ingame.level_saver.save(cur_level, "Case completed")
+					ingame.theme_handler.play("victory")
 				else
 					ingame.game_phase="cold case"
 					ingame.level_saver.save(cur_level, "Cold case")

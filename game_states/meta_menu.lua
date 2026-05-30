@@ -5,7 +5,8 @@ local meta_menu = {
 	end_x_cut = 500,
 	end_x_cut_long = 650,
 	mouse_debounce_click = true,
-	next_item_offset = 50
+	next_item_offset = 50,
+	intro_screen = love.graphics.newImage("office.png")
 }
 
 local function inside_button(start_x, start_y)
@@ -20,6 +21,11 @@ end
 
 local function meta_draw(elements)
 	return function()
+		local prev_red, prev_green, prev_blue = love.graphics.getColor()
+		love.graphics.setColor(0.5, 0.5, 0.5)
+		love.graphics.draw(meta_menu.intro_screen, 0, 0, 0, window_initial_width/meta_menu.intro_screen:getWidth(), window_initial_height/meta_menu.intro_screen:getHeight())
+		love.graphics.setColor(1.0, 1.0, 1.0)
+
 		for index,element in ipairs(elements) do
 			local type = element.type
 			if type == "text" then
@@ -36,6 +42,7 @@ local function meta_draw(elements)
 				end
 			end
 		end
+		love.graphics.setColor(prev_red, prev_green, prev_blue)
 	end
 end
 
