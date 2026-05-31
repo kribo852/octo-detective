@@ -44,21 +44,22 @@ The clues have among other properties:
 
 ## Progress and new features
 There are some unimplemented features still, to make the game complete, and others 
-that would be nice to have:
+that would be nice to have. This is a list of the features implemented and still 
+not implemented:
 
 * ~~Case closed, level complete, on the arrest of the correct person~~
 * ~~Cold case, on the arrest of the incorrect person~~
 * Animations
 * Assistants, Liz, Gary and Rufus the german shepherd, to help solve the case
 * ~~A page in the menu, for the controls~~
-* Save the results from a level, so the game remembers completed maps
+* ~~Save the results from a level, so the game remembers completed maps~~
 * ~~Navigate the clue summary menu~~
-* ~~Dismiss clue information with a button press~~
+* Dismiss clue information with a button press
 * Clues that activate on a timer
 * More complicated level designs, with lakes, roads, and urban areas
 * Lakes and rivers
 * Different types of terrain
-* Start screen
+* ~~Start screen~~
 * Day night cycle
 * Better name generation
 * A scrollable ledger
@@ -67,6 +68,7 @@ that would be nice to have:
 * ~~Ability to choose between levels~~
 * Many more levels
 * ~~Weather~~
+* Collisions with other persons on the map 
 
 ## Third party assets
 The music in this project (found in the third_party_assets folder) is not made or owned by me,
