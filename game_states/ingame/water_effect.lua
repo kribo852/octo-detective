@@ -48,12 +48,14 @@ local water_effect = {
 
             float randomValue_x = 24*random(o_x)-12; 
             float randomValue_y = 24*random(o_y)-12;
-            float sinef = sin((ticker + o_x + o_y + randomValue_x + randomValue_y)/7);
+            float sinef_a = sin((ticker + o_x + o_y + randomValue_x + randomValue_y)/7);
+            float sinef_b = sin((ticker + o_x + o_y + randomValue_x + randomValue_y)/7 + 3.14/3);
+            float sinef_c = sin((ticker + o_x + o_y + randomValue_x + randomValue_y)/7 + 6.28/3);
 
             vec4 pixelColor = vec4(
-                0.45 + 0.025*sinef, // R
-                0.35 + 0.025*sinef, // G
-                0.35 + 0.025*sinef, // B
+                0.45 + 0.0325*sinef_a, // R
+                0.35 + 0.0325*sinef_b, // G
+                0.30 + 0.0325*sinef_c, // B
                 1 // A (full opacity)
             );
 
