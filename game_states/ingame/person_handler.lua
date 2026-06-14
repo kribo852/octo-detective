@@ -23,7 +23,7 @@ local function head_toward_direction(wanted_x, wanted_y, current_x, current_y, o
 end
 
 local function stroll_behaviour(obstacle_at_position_func, x_pos, y_pos)
-	if love.math.random() < 0.98 then 
+	if love.math.random() < 0.98 then
 		return nil
 	end
 
@@ -46,7 +46,7 @@ local function stroll_behaviour(obstacle_at_position_func, x_pos, y_pos)
 	end
 
 	local directions = { {1,0}, {-1,0}, {0,1}, {0,-1} }
-	local direction = love.math.random(4) 
+	local direction = love.math.random(4)
 
 	if not obstacle_at_position_func(x_pos+directions[direction][1], y_pos+directions[direction][2]) then
 		return directions[direction][1], directions[direction][2]
@@ -121,10 +121,10 @@ local function make_move_func(behaviour, obstacle_at_position_func, x_pos, y_pos
 	end
 end
 
-function person_handler.move(delta_time, obstacle_at_position_func)	
-	for index, person in ipairs(person_handler.persons) do
+function person_handler.move(delta_time, obstacle_at_position_func)
+	for _, person in ipairs(person_handler.persons) do
 		if person.move_func then
-			new_x, new_y, new_facing = person.move_func(delta_time, person.x, person.y)
+			local new_x, new_y, new_facing = person.move_func(delta_time, person.x, person.y)
 
 			if not new_x then
 				person.move_func = nil
@@ -145,11 +145,11 @@ end
 function person_handler.set_persons(persons)
 	person_handler.persons = {}
 	for _,person in ipairs(persons) do
-		table.insert(person_handler.persons, 
+		table.insert(person_handler.persons,
 			{
-			 x=person.position.x, 
-			 y=person.position.y, 
-			 behaviour=person.behaviour, 
+			 x=person.position.x,
+			 y=person.position.y,
+			 behaviour=person.behaviour,
 			 name=person.name,
 			 type=person.type,
 			 facing=1

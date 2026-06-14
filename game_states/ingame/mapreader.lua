@@ -1,9 +1,6 @@
 -- clues can be objects, persons or footprint
 
 local mapreader = {
-	clues = {},
-	obstacles = {},
-	persons = {},
 	name_generator = require "name_generator"
 }
 
@@ -11,8 +8,8 @@ function mapreader.make_clue(clue)
 	table.insert(mapreader.clues, {
 			name = mapreader.name_tokens(clue.name),
 			type = clue.type,
-			is_murderer = clue.is_murderer, 
-			is_discovered = clue.is_discovered, 
+			is_murderer = clue.is_murderer,
+			is_discovered = clue.is_discovered,
 			carried = clue.carried,
 			image = clue.image,
 			display_on_ground_image = clue.display_on_ground_image,
@@ -45,7 +42,15 @@ function mapreader.around(name)
 
 	return function(around_function) -- input is a lookup function that takes a name and returns the surrounding positions
 		return around_function(lookup_name)
-	end 
+	end
+end
+
+function mapreader.add_river(river)
+	mapreader.river = river
+end
+
+function mapreader.get_river()
+	return mapreader.river
 end
 
 
@@ -53,20 +58,22 @@ function mapreader.readfile(filename)
 	mapreader.clues = {} -- clear previous data
 	mapreader.obstacles = {}
 	mapreader.persons = {}
+	mapreader.river = nil
 	mapreader.size = nil
 	mapreader.name_generator.reset()
 
-	loadfile ("levels/"..filename, "t", 
+	loadfile ("levels/"..filename, "t",
 		{
-			set_size=mapreader.set_size, 
+			set_size=mapreader.set_size,
 			make_clue=mapreader.make_clue,
 			set_detective=mapreader.set_detective,
 			add_obstacle=mapreader.add_obstacle,
 			add_person=mapreader.add_person,
 			around=mapreader.around,
-			none=mapreader.none_clues, 
+			none=mapreader.none_clues,
 			one=mapreader.one_clues,
-			all=mapreader.all_clues
+			all=mapreader.all_clues,
+			add_river=mapreader.add_river
 		}
 	)()
 end
@@ -77,13 +84,13 @@ end
 
 function mapreader.one_clues( ... )
 	local collect = {...}
-	return function(names_of_discovered_clues) 
+	return function(names_of_discovered_clues)
 		for index,value in ipairs(collect) do
 			if type(value) == "string" then
 				if names_of_discovered_clues[value] then
 					return true
 				end
-			else 
+			else
 				if value(names_of_discovered_clues) then
 					return true
 				end
@@ -95,13 +102,13 @@ end
 
 function mapreader.all_clues( ... )
 	local collect = {...}
-	return function(names_of_discovered_clues) 
+	return function(names_of_discovered_clues)
 		for index,value in ipairs(collect) do
 			if type(value) == "string" then
 				if not names_of_discovered_clues[value] then
 					return false
 				end
-			else 
+			else
 				if not value(names_of_discovered_clues) then
 					return false
 				end

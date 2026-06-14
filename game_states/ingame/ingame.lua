@@ -1,40 +1,43 @@
 local ingame = {
-	obstacles = {},  
+	obstacles = {},
 	detective_image = love.graphics.newImage("detective.png"),
 	person_image = love.graphics.newImage("person.png"),
 	mobile_phone_image = love.graphics.newImage("call_police_station.png"),
-	detective = {facing_direction=1},
+	detective = {facing_direction = 1},
 	clues_images = {},
 	clue_handler = require "game_states.ingame.clue_handler",
 	clue_summary_control = require "game_states.ingame.clue_summary_control",
 	mouse_pointer = require "game_states.mouse_pointer",
-	d_p_c = require "game_states.ingame.draw_position_calculator", 
+	d_p_c = require "game_states.ingame.draw_position_calculator",
 	image_handler = require "game_states.ingame.image_handler",
 	person_handler = require "game_states.ingame.person_handler",
 	level_saver = require "level_saver",
 	theme_handler = require "theme_handler",
-	weather = require "weather"
+	weather = require "weather",
+	river_handler = require "game_states.ingame.river_handler",
+	water_effect = require "game_states.ingame.water_effect"
 }
 
 local scale = 3
 
 function ingame.init()
+	ingame.water_effect.load()
 	ingame.obstacles = {}
 	ingame.obstacle_lookup = function(name) return nil end -- fresh lookup function for obstacles
-	
+
 	ingame.read_from_mapreader()
 
 	for i=1,ingame.size do
 		ingame.obstacles[i] = ingame.obstacles[i] or {} -- to not removed obstacles from map file
 		for j=1,ingame.size do
-			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j) 
+			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j)
 				and love.math.random() < 0.15 then
 				ingame.obstacles[i][j] = "tree"..love.math.random(4)
 			end
 		end
 	end
 	ingame.clue_handler.set_get_player_position(
-		function() 
+		function()
 			local detective = ingame.person_handler.get_person_lookup("Detective")
 			return detective[1], detective[2]
 			end
@@ -57,7 +60,7 @@ function ingame.read_from_mapreader()
 		if(not ingame.clues_images[mapreader.clues[i].name]) then
 			ingame.clues_images[mapreader.clues[i].name] = {}
 			ingame.clues_images[mapreader.clues[i].name]["image"] = love.graphics.newImage(mapreader.clues[i].image)
-			if mapreader.clues[i].display_on_ground_image then 
+			if mapreader.clues[i].display_on_ground_image then
 				ingame.clues_images[mapreader.clues[i].name]["display_on_ground_image"] = love.graphics.newImage(mapreader.clues[i].display_on_ground_image)
 			end
 		end
@@ -69,6 +72,7 @@ function ingame.read_from_mapreader()
 	ingame.person_handler.set_persons(mapreader.persons)
 	ingame.person_handler.set_map_size(ingame.size)
 	ingame.clue_handler.set_around_lookup_function(ingame.make_around_function(ingame.person_handler.get_person_lookup, ingame.obstacle_lookup))
+	ingame.river_handler.set_river(mapreader.get_river(), ingame.size)
 end
 
 function ingame.compose_lookup(mapreader)
@@ -87,14 +91,14 @@ local function run_if_ready_to_arrest(func_to_run)
 	local discovered_clues = ingame.clue_handler.get_discovered_summary()
 	local index = ingame.clue_summary_control.get_selected_index()
 
-	if #discovered_clues > 0 and discovered_clues[index] and discovered_clues[index].type == "person" and 
+	if #discovered_clues > 0 and discovered_clues[index] and discovered_clues[index].type == "person" and
 		ingame.game_phase=="ongoing" then
 			func_to_run()
 	end
 end
 
-local function draw_persons() 
-	for index,person in ipairs(ingame.person_handler.persons) do
+local function draw_persons()
+	for _,person in ipairs(ingame.person_handler.persons) do
 		local draw_x,draw_y = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, person.x, person.y, true)
 		if person.type == "person" then
 			love.graphics.draw(ingame.person_image, draw_x, draw_y, 0, scale*person.facing, scale, 10, 10)
@@ -111,14 +115,29 @@ local function draw_obstacles()
 	-- for obstacles
 	for i = math.floor(detective.x)-10 , math.floor(detective.x)+10 do
 		for j = math.floor(detective.y)-10,math.floor(detective.y)+10 do
-			local draw_x,draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j, true)
 			if ingame.obstacles[i] and ingame.obstacles[i][j] then
-					love.graphics.draw(ingame.image_handler.world_img, ingame.image_handler[ingame.obstacles[i][j]] ,  draw_x, draw_y, 0, scale, scale, 10, 10)
+				local draw_x,draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j, true)
+				love.graphics.draw(ingame.image_handler.world_img, ingame.image_handler[ingame.obstacles[i][j]] ,  draw_x, draw_y, 0, scale, scale, 10, 10)
 					-- orientation, scalex, scaley, origin_offset
 			else
 				if (i*13+j*11)%19==0 then
+					local draw_x,draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j, true)
 					love.graphics.draw(ingame.image_handler.world_img, ingame.image_handler.plants,  draw_x, draw_y, 0, scale, scale, 10, 10)
 				end
+			end
+		end
+	end
+end
+
+local function draw_river()
+	local detective = get_detective()
+
+	for i = math.floor(detective.x)-10, math.floor(detective.x)+10 do
+		for j = math.floor(detective.y)-10, math.floor(detective.y)+10 do
+			if ingame.river_handler.collision_with_river(i, j) then
+				local draw_x, draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
+				local draw_x_end, draw_y_end = ingame.d_p_c.calc_end(detective.x, detective.y, i, j)
+				ingame.water_effect.make_water_effect(draw_x, draw_y, draw_x_end, draw_y_end)
 			end
 		end
 	end
@@ -128,7 +147,7 @@ local function draw_centered_text(text)
 	love.graphics.printf(text, window_initial_width/2, window_initial_height/2, 300, "center", 0, 1.5, 1.5, 150)
 end
 
-local function draw_object_description() 
+local function draw_object_description()
 	local description = ingame.clue_handler.get_active_clue_description()
 
 	if description then
@@ -136,7 +155,7 @@ local function draw_object_description()
 	end
 end
 
-local function draw_pick_up_tooltip() 
+local function draw_pick_up_tooltip()
 	local tmp_clue = ingame.clue_handler.can_be_discovered()
 
 	if tmp_clue then
@@ -167,8 +186,6 @@ local function draw_on_victory_or_loss()
 end
 
 local function draw_notification_for_arrest_person()
-	local discovered_clues = ingame.clue_handler.get_discovered_summary()
-	local index = ingame.clue_summary_control.get_selected_index()
 
 	local around_func = ingame.make_around_function(ingame.obstacle_lookup)
 
@@ -187,7 +204,7 @@ end
 
 local function draw_map_boundary()
 	local detective = get_detective()
-	prev_red, prev_green, prev_blue = love.graphics.getColor()
+	local prev_red, prev_green, prev_blue = love.graphics.getColor()
 
 	for i = math.floor(detective.x)-10, math.floor(detective.x)+10 do
 		for j = math.floor(detective.y)-10, math.floor(detective.y)+10 do
@@ -225,11 +242,12 @@ function ingame.draw()
 	love.graphics.rectangle("fill", 0, 0, window_initial_width, window_initial_height)--this is the background
 	love.graphics.setColor(bg_red, bg_green, bg_blue, bg_alpha)
 	draw_obstacles()
-	draw_clues()	 
+	draw_river()
+	draw_clues()
 	draw_persons()
-	
+
 	draw_map_boundary()
-	
+
 	draw_pick_up_tooltip()
 	draw_object_description()
 	draw_on_victory_or_loss()
@@ -247,33 +265,29 @@ function ingame.generate_dicovered_clues_name_iterator()
 		index=index+1
 		if index <= #discovered_clues then
 			return index,discovered_clues[index].name
-		end	
+		end
 	end
 end
 
 function ingame.clue_summary_image_getter(image_name)
  	return ingame.clues_images[image_name]["image"]
-end 
-
-local function get_obstacle_for_position(x_pos, y_pos)
-	if ingame.obstacles[math.floor(x_pos+0.5)] then
-		return ingame.obstacles[math.floor(x_pos+0.5)][math.floor(y_pos+0.5)]
-	end
 end
 
 function ingame.update(delta_time, transition_to_menu_state)
 	if debounce_keyboard.check("escape") then
 		transition_to_menu_state()
-	end 
+	end
 
 	ingame.discover_action()
-
-	--move_player(delta_time)
 
 	ingame.clue_handler.check_disable_description()
 	ingame.clue_summary_control.check_for_clue_clicked()
 	ingame.call_police_station_if_person_selected()
-	ingame.person_handler.move(delta_time, function(x_pos, y_pos) return ingame.obstacles[x_pos] and ingame.obstacles[x_pos][y_pos] end)
+	ingame.person_handler.move(delta_time, function(x_pos, y_pos)
+		return ingame.obstacles[x_pos] and ingame.obstacles[x_pos][y_pos] or
+		ingame.river_handler.collision_with_river(x_pos, y_pos)=="river"
+	end
+	)
 	ingame.weather.update()
 end
 
@@ -285,7 +299,7 @@ function ingame.discover_action()
 end
 
 local function add_layer_to_lookup(prev_obstacle_lookup, match_name, position)
-	return function(name) 
+	return function(name)
 		if name == match_name then
 			return position
 		end
@@ -324,21 +338,21 @@ function ingame.at_defined_obstacle(obstacle)
 	local detective = get_detective()
 	local obstacle_position = ingame.obstacle_lookup(obstacle)
 
-	return obstacle_position and math.abs(detective.x - obstacle_position[1]) + math.abs(detective.y - obstacle_position[2]) == 1 
+	return obstacle_position and math.abs(detective.x - obstacle_position[1]) + math.abs(detective.y - obstacle_position[2]) == 1
 end
 
 function ingame.make_around_function(...)
 
 	local func_lookups = {...}
-	
+
 	return function(name)
 
-		for index,lookup in ipairs(func_lookups) do
+		for _,lookup in ipairs(func_lookups) do
 			if lookup then
 				local position = lookup(name)
 
 				if position then
-					return {{position[1]+1, position[2]}, {position[1]-1, position[2]}, 
+					return {{position[1]+1, position[2]}, {position[1]-1, position[2]},
 					{position[1], position[2]+1}, {position[1], position[2]-1}}
 				end
 			end

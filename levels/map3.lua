@@ -8,3 +8,7 @@ add_obstacle {
 	type = "police_car",
 	position = {x = -1, y = 19}
 }
+add_river {
+	x0_y = 15,
+	run = { {"clockwise", 10}, {"counterclockwise", 7}, {"clockwise", 10}, {"counterclockwise", 10}, {"counterclockwise", 10} }
+}

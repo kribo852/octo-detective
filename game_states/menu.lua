@@ -4,6 +4,10 @@ local menu = {
 	theme_handler = require "theme_handler"
 }
 
+function menu.load()
+	menu.theme_handler.play("opening")
+end
+
 function menu.draw()
 	local menu_obj = menu.meta_menu.get_menu_layout({
 		{type = "text", value = "Menu"},
@@ -19,8 +23,6 @@ function menu.update(delta_time, transition_to_forward_state, transition_to_cont
 	if debounce_keyboard.check("escape") then
 		love.event.quit(0)
 	end
-
-	menu.theme_handler.play("opening")
 
 	local menu_obj = menu.meta_menu.get_menu_layout({
 		{type = "text", value = "Menu"},

@@ -26,7 +26,7 @@ function love.load()
 end
 
 function init_game_state_transitions()
-	game_state_engine.register_state("menu", menu.update, menu.draw)
+	game_state_engine.register_state("menu", menu.update, menu.draw, menu.load, nil)
 	game_state_engine.register_update_arguments("menu", {"to_level_selector_state", "to_view_controls"})
 	game_state_engine.register_draw_arguments("menu", {})
 
