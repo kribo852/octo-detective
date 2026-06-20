@@ -4,6 +4,8 @@ local river_handler = {
 
 }
 
+local river_constant = "river"
+
 local function pre_set_outside_map(river, map_size)
 	local prev = river_handler.collision_with_river
 
@@ -11,7 +13,7 @@ local function pre_set_outside_map(river, map_size)
 		river_handler.collision_with_river = function (x_pos, y_pos)
 			if x_pos < 1 then
 				if river.x0_y == y_pos then
-					return "river"
+					return river_constant
 				end
 			end
 			return prev(x_pos, y_pos)
@@ -22,7 +24,7 @@ local function pre_set_outside_map(river, map_size)
 		river_handler.collision_with_river = function (x_pos, y_pos)
 			if x_pos > river.map_size then
 				if river.x1_y == y_pos then
-					return "river"
+					return river_constant
 				end
 			end
 			return prev(x_pos, y_pos)
@@ -33,7 +35,7 @@ local function pre_set_outside_map(river, map_size)
 		river_handler.collision_with_river = function (x_pos, y_pos)
 			if y_pos < 1 then
 				if river.y0_x == y_pos then
-					return "river"
+					return river_constant
 				end
 			end
 			return prev(x_pos, y_pos)
@@ -44,7 +46,7 @@ local function pre_set_outside_map(river, map_size)
 		river_handler.collision_with_river = function (x_pos, y_pos)
 			if x_pos > river.map_size then
 				if river.y1_x == y_pos then
-					return "river"
+					return river_constant
 				end
 			end
 			return prev(x_pos, y_pos)
@@ -67,7 +69,7 @@ local function make_inside_map_river(river, map_size)
 	end
 
 	while current_x > 0 and current_x <= map_size and current_y > 0 and current_y <= map_size do
- 		river_handler.inside_map_lookup[tostring(current_x).."#"..tostring(current_y)] = "river"
+ 		river_handler.inside_map_lookup[tostring(current_x).."#"..tostring(current_y)] = river_constant
  		current_x = current_x  + direction_x
  		current_y = current_y  + direction_y
 
@@ -79,9 +81,13 @@ local function make_inside_map_river(river, map_size)
  				if river.run[current_clause][1] == "clockwise" then
  					direction_y = direction_x
  					direction_x = -tmp_dir
- 				else
+ 				elseif river.run[current_clause][1] == "counterclockwise" then
  					direction_y = -direction_x
  					direction_x = tmp_dir
+ 				else --crossing 
+ 					river_handler.inside_map_lookup[tostring(current_x).."#"..tostring(current_y)] = "crossing"
+ 					current_x = current_x  + direction_x
+ 					current_y = current_y  + direction_y
  				end
 
  				current_clause = current_clause + 1
@@ -100,6 +106,45 @@ local function make_inside_map_river(river, map_size)
 		return prev_func(x_pos, y_pos)
 	end
 
+	return current_x, current_y
+end
+
+local function post_set_outside_map(c_x, c_y, map_size)
+
+	local prev_func = river_handler.collision_with_river
+
+	if(c_x == 0) then
+		river_handler.collision_with_river = function(x, y) 
+			if x < 1 and y == c_y then return river_constant end
+
+			return prev_func(x, y)
+		end
+	end
+
+	if(c_x == map_size + 1) then
+		river_handler.collision_with_river = function(x, y) 
+			if x > map_size and y == c_y then return river_constant end
+
+			return prev_func(x, y)
+		end
+	end
+
+	if(c_y == 0) then
+		river_handler.collision_with_river = function(x, y) 
+			if y < 1 and x == c_x then return river_constant end
+
+			return prev_func(x, y)
+		end
+	end
+
+	if(c_y == map_size + 1) then
+		river_handler.collision_with_river = function(x, y) 
+			if y > map_size and x == c_x then return river_constant end
+
+			return prev_func(x, y)
+		end
+	end
+
 end
 
 function river_handler.set_river(river, map_size)
@@ -111,9 +156,9 @@ function river_handler.set_river(river, map_size)
 	end
 
  	pre_set_outside_map(river, map_size)
- 	make_inside_map_river(river, map_size)
+ 	local c_x, c_y = make_inside_map_river(river, map_size)
+ 	post_set_outside_map(c_x, c_y, map_size)
 
 end
 
 return river_handler
-

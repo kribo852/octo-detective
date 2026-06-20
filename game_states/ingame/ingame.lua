@@ -138,6 +138,9 @@ local function draw_river()
 				local draw_x, draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
 				local draw_x_end, draw_y_end = ingame.d_p_c.calc_end(detective.x, detective.y, i, j)
 				ingame.water_effect.make_water_effect(draw_x, draw_y, draw_x_end, draw_y_end)
+				if ingame.river_handler.collision_with_river(i, j) == "crossing" then 
+					love.graphics.draw(ingame.image_handler.world_img, ingame.image_handler.crossing_stones,  draw_x, draw_y, 0, scale, scale, 0, 0)
+				end
 			end
 		end
 	end
