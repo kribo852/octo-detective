@@ -33,7 +33,6 @@ local water_effect = {
     ]]
 
     local shader2 = [[
-
         uniform float ticker;
         uniform int start_x;
         uniform int start_y;
@@ -63,25 +62,51 @@ local water_effect = {
         }
     ]]
 
-function water_effect.make_water_effect(start_x, start_y, end_x, end_y)
+     local shader3 = [[
+        uniform float ticker;
+        uniform int start_x;
+        uniform int start_y;
+
+        vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+            float o_x = 3.14*(screen_coords[0] - start_x)/30;
+            float o_y = 3.14*(screen_coords[1] - start_y)/30;
+
+            float sinef_a = sin((ticker + o_x + o_y))*2;
+            float sinef_b = sin((ticker + o_x + o_y*2));
+            float sinef_c = sin((ticker + o_x + o_y*5));
+
+            vec4 pixelColorAtTexture = Texel(texture, texture_coords);
+
+            vec4 pixelColor = vec4(
+                mix(0.35, pixelColorAtTexture[0], 0.08 + 0.08 * (sinef_a+sinef_b+sinef_c) ), // R
+                mix(0.45, pixelColorAtTexture[1], 0.08 + 0.08 * (sinef_a+sinef_b+sinef_c) ), // G
+                mix(0.40, pixelColorAtTexture[2], 0.08 + 0.08 * (sinef_a+sinef_b+sinef_c) ), // B
+                1 // A (full opacity)
+            );
+
+            return pixelColor;
+        }
+    ]]
+
+function water_effect.make_water_effect(start_x, start_y, end_x, end_y, scale)
 	water_effect.ticker = water_effect.ticker + 1
-	water_effect.shader:send("start_x", start_x)
-	water_effect.shader:send("start_y", start_y)
-	water_effect.shader:send("ticker", math.floor(water_effect.ticker / 50))
+	water_effect.shader:send("ticker", water_effect.ticker / 250)
+    water_effect.shader:send("start_x", start_x)
+    water_effect.shader:send("start_y", start_y)
+
 	love.graphics.setShader(water_effect.shader)
-	love.graphics.draw(water_effect.background_image, start_x, start_y)
+	love.graphics.draw(water_effect.background_image, start_x, start_y, 0, scale or 3)
 	love.graphics.setShader()
 end
 
 function water_effect.load()
-	local canvas = love.graphics.newCanvas(60, 60)
-	love.graphics.setCanvas(canvas)
-    love.graphics.clear(1, 1, 1)
-    love.graphics.setCanvas()
+	--local canvas = love.graphics.newCanvas(60, 60)
+	--love.graphics.setCanvas(canvas)
+    --love.graphics.clear(0.5, 0.3, 0)
+    --love.graphics.setCanvas()
 
-	water_effect.shader = love.graphics.newShader(shader2)
-	local imageData = canvas:newImageData()
-	water_effect.background_image = love.graphics.newImage(imageData)
+	water_effect.shader = love.graphics.newShader(shader3)
+	water_effect.background_image = love.graphics.newImage("river_bottom.png")
 end
 
 return water_effect
