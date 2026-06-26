@@ -71,16 +71,16 @@ local water_effect = {
             float o_x = 3.14*(screen_coords[0] - start_x)/30;
             float o_y = 3.14*(screen_coords[1] - start_y)/30;
 
-            float sinef_a = sin((ticker + o_x + o_y))*2;
-            float sinef_b = sin((ticker + o_x + o_y*2));
-            float sinef_c = sin((ticker + o_x + o_y*5));
+            float sinef_a = sin((ticker + o_x + o_y));
+            float sinef_b = sin((ticker + o_x + o_y)*2);
+            float sinef_c = sin((ticker + o_x - o_y)*3);
 
             vec4 pixelColorAtTexture = Texel(texture, texture_coords);
 
             vec4 pixelColor = vec4(
-                mix(0.35, pixelColorAtTexture[0], 0.08 + 0.08 * (sinef_a+sinef_b+sinef_c) ), // R
-                mix(0.45, pixelColorAtTexture[1], 0.08 + 0.08 * (sinef_a+sinef_b+sinef_c) ), // G
-                mix(0.40, pixelColorAtTexture[2], 0.08 + 0.08 * (sinef_a+sinef_b+sinef_c) ), // B
+                mix(0.35, pixelColorAtTexture[0], 0.125 + 0.05 * (sinef_a+sinef_b+sinef_c) ), // R
+                mix(0.45, pixelColorAtTexture[1], 0.125 + 0.05 * (sinef_a+sinef_b+sinef_c) ), // G
+                mix(0.40, pixelColorAtTexture[2], 0.125 + 0.05 * (sinef_a+sinef_b+sinef_c) ), // B
                 1 // A (full opacity)
             );
 
@@ -90,7 +90,7 @@ local water_effect = {
 
 function water_effect.make_water_effect(start_x, start_y, end_x, end_y, scale)
 	water_effect.ticker = water_effect.ticker + 1
-	water_effect.shader:send("ticker", water_effect.ticker / 250)
+	water_effect.shader:send("ticker", water_effect.ticker / 750)
     water_effect.shader:send("start_x", start_x)
     water_effect.shader:send("start_y", start_y)
 
