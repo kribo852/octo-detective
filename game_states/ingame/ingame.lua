@@ -3,6 +3,7 @@ local ingame = {
 	detective_image = love.graphics.newImage("detective.png"),
 	person_image = love.graphics.newImage("person.png"),
 	mobile_phone_image = love.graphics.newImage("call_police_station.png"),
+	grass_texture = love.graphics.newImage("grass_texture.png"),
 	detective = {facing_direction = 1},
 	clues_images = {},
 	clue_handler = require "game_states.ingame.clue_handler",
@@ -15,7 +16,8 @@ local ingame = {
 	theme_handler = require "theme_handler",
 	weather = require "weather",
 	river_handler = require "game_states.ingame.river_handler",
-	water_effect = require "game_states.ingame.water_effect"
+	water_effect = require "game_states.ingame.water_effect",
+	noise_generator = require "game_states.ingame.noise_generator"
 }
 
 local scale = 3
@@ -24,6 +26,8 @@ function ingame.init()
 	ingame.water_effect.load()
 	ingame.obstacles = {}
 	ingame.obstacle_lookup = function(name) return nil end -- fresh lookup function for obstacles
+	ingame.grass_generator = ingame.noise_generator.new_random_func(2)
+	ingame.tree_generator = ingame.noise_generator.new_random_func(1)
 
 	ingame.read_from_mapreader()
 
@@ -32,7 +36,7 @@ function ingame.init()
 		for j=1,ingame.size do
 			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j) 
 				and not ingame.river_handler.collision_with_river(i, j)
-				and love.math.random() < 0.15 then
+				and (ingame.tree_generator.smooth_random(i, j, 1) < 0.425 or love.math.random() < 0.1) then
 				ingame.obstacles[i][j] = "tree"..love.math.random(4)
 			end
 		end
@@ -240,11 +244,30 @@ local function draw_map_boundary()
 	love.graphics.setColor(prev_red, prev_green, prev_blue)
 end
 
+local function draw_ground()
+	local detective = get_detective()
+	local r, g, b = love.graphics.getColor()
+
+	for i = math.floor(detective.x)-10, math.floor(detective.x)+10 do
+		for j = math.floor(detective.y)-10, math.floor(detective.y)+10 do
+			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
+			
+			if ingame.grass_generator.smooth_random(i, j) > 0.5 then
+				love.graphics.setColor(0.6, 0.6, 0.3) -- dry grass
+			else
+				love.graphics.setColor(0.15, 0.4, 0.25)
+			end
+			love.graphics.draw(ingame.grass_texture, draw_x_start, draw_y_start, 0, scale, scale)
+		end
+	end
+
+	love.graphics.setColor(r, g, b)
+end
+
 function ingame.draw()
-	local bg_red, bg_green, bg_blue, bg_alpha = love.graphics.getColor()
-	love.graphics.setColor(0.0, 0.375, 0.250)
-	love.graphics.rectangle("fill", 0, 0, window_initial_width, window_initial_height)--this is the background
-	love.graphics.setColor(bg_red, bg_green, bg_blue, bg_alpha)
+	--local bg_red, bg_green, bg_blue, bg_alpha = love.graphics.getColor()
+	draw_ground()
+	--love.graphics.setColor(bg_red, bg_green, bg_blue, bg_alpha)
 	draw_obstacles()
 	draw_river()
 	draw_clues()
