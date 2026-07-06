@@ -57,8 +57,9 @@ not implemented:
 * Dismiss clue information with a button press
 * Clues that activate on a timer
 * More complicated level designs, with lakes, roads, and urban areas
-* Lakes and rivers
-* Different types of terrain
+* Lakes 
+* ~~Rivers~~
+* ~~Different types of terrain~~
 * ~~Start screen~~
 * Day night cycle
 * Better name generation
@@ -68,7 +69,7 @@ not implemented:
 * ~~Ability to choose between levels~~
 * Many more levels
 * ~~Weather~~
-* Collisions with other persons on the map 
+* Collisions with other persons on the map
 
 ## Third party assets
 The music in this project (found in the third_party_assets folder) is not made or owned by me,
