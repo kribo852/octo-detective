@@ -57,7 +57,7 @@ end
 local function make_inside_map_river(river, map_size)
 	local current_x, current_y;
 	local current_clause = 1
-	local countdown = river.run[current_clause] and river.run[current_clause][2]
+	local countdown = river.run[current_clause] and river.run[current_clause][1]
 	local direction_x 
 	local direction_y
 
@@ -78,10 +78,10 @@ local function make_inside_map_river(river, map_size)
 
  			if countdown <= 0 then
  				local tmp_dir = direction_y
- 				if river.run[current_clause][1] == "clockwise" then
+ 				if river.run[current_clause][2] == "clockwise" then
  					direction_y = direction_x
  					direction_x = -tmp_dir
- 				elseif river.run[current_clause][1] == "counterclockwise" then
+ 				elseif river.run[current_clause][2] == "counterclockwise" then
  					direction_y = -direction_x
  					direction_x = tmp_dir
  				else --crossing 
@@ -91,7 +91,7 @@ local function make_inside_map_river(river, map_size)
  				end
 
  				current_clause = current_clause + 1
- 				countdown = river.run[current_clause] and river.run[current_clause][2]
+ 				countdown = river.run[current_clause] and river.run[current_clause][1]
  			end
  		end
  	end
