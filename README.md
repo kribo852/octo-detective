@@ -18,6 +18,8 @@ Use the mouse to switch between clues in the summary, and in particular for sele
 
 Use escape to exit to the menu
 
+![a screenshot of the game, a police car, a detective, and a river](screenshots/screenshot1.png)
+
 ## Techniques used
 This project uses the Love 2D game engine, version 11.5
 The programing language used is Lua
