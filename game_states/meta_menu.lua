@@ -6,7 +6,7 @@ local meta_menu = {
 	end_x_cut_long = 650,
 	mouse_debounce_click = true,
 	next_item_offset = 50,
-	intro_screen = love.graphics.newImage("office.png")
+	intro_screen = love.graphics.newImage("assets/office.png")
 }
 
 local function inside_button(start_x, start_y)

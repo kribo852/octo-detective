@@ -1,9 +1,9 @@
 local ingame = {
 	obstacles = {},
-	detective_image = love.graphics.newImage("detective.png"),
-	person_image = love.graphics.newImage("person.png"),
-	mobile_phone_image = love.graphics.newImage("call_police_station.png"),
-	grass_texture = love.graphics.newImage("grass_texture.png"),
+	detective_image = love.graphics.newImage("assets/detective.png"),
+	person_image = love.graphics.newImage("assets/person.png"),
+	mobile_phone_image = love.graphics.newImage("assets/call_police_station.png"),
+	grass_texture = love.graphics.newImage("assets/grass_texture.png"),
 	detective = {facing_direction = 1},
 	clues_images = {},
 	clue_handler = require "game_states.ingame.clue_handler",
@@ -64,9 +64,9 @@ function ingame.read_from_mapreader()
 	for i=1, #mapreader.clues do
 		if(not ingame.clues_images[mapreader.clues[i].name]) then
 			ingame.clues_images[mapreader.clues[i].name] = {}
-			ingame.clues_images[mapreader.clues[i].name]["image"] = love.graphics.newImage(mapreader.clues[i].image)
+			ingame.clues_images[mapreader.clues[i].name]["image"] = love.graphics.newImage("assets/"..mapreader.clues[i].image)
 			if mapreader.clues[i].display_on_ground_image then
-				ingame.clues_images[mapreader.clues[i].name]["display_on_ground_image"] = love.graphics.newImage(mapreader.clues[i].display_on_ground_image)
+				ingame.clues_images[mapreader.clues[i].name]["display_on_ground_image"] = love.graphics.newImage("assets/"..mapreader.clues[i].display_on_ground_image)
 			end
 		end
 		clues[mapreader.clues[i].name] = mapreader.clues[i]

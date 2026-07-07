@@ -1,4 +1,4 @@
-local world_img = love.graphics.newImage("objects.png")
+local world_img = love.graphics.newImage("assets/objects.png")
 
 
 local image_handler = {
