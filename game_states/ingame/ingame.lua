@@ -17,10 +17,17 @@ local ingame = {
 	weather = require "weather",
 	river_handler = require "game_states.ingame.river_handler",
 	water_effect = require "game_states.ingame.water_effect",
-	noise_generator = require "game_states.ingame.noise_generator"
+	noise_generator = require "game_states.ingame.noise_generator",
+	day_night_cycle = require "game_states.ingame.day_night_cycle"
 }
 
 local scale = 3
+
+local function get_detective()
+	local detective_lookup_data = ingame.person_handler.get_person_lookup("Detective")
+
+	return {x=detective_lookup_data[1], y=detective_lookup_data[2]}
+end
 
 function ingame.init()
 	ingame.water_effect.load()
@@ -28,11 +35,12 @@ function ingame.init()
 	ingame.obstacle_lookup = function(name) return nil end -- fresh lookup function for obstacles
 	ingame.grass_generator = ingame.noise_generator.new_random_func(2)
 	ingame.tree_generator = ingame.noise_generator.new_random_func(1)
+	ingame.clock = ingame.day_night_cycle.get_return_object()
 
 	ingame.read_from_mapreader()
 
 	for i=1,ingame.size do
-		ingame.obstacles[i] = ingame.obstacles[i] or {} -- to not removed obstacles from map file
+		ingame.obstacles[i] = ingame.obstacles[i] or {} -- to not remove obstacles from map file
 		for j=1,ingame.size do
 			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j) 
 				and not ingame.river_handler.collision_with_river(i, j)
@@ -41,12 +49,7 @@ function ingame.init()
 			end
 		end
 	end
-	ingame.clue_handler.set_get_player_position(
-		function()
-			local detective = ingame.person_handler.get_person_lookup("Detective")
-			return detective[1], detective[2]
-			end
-	) -- refactor this later, it is more obvious to use a dictionary
+	ingame.clue_handler.set_get_player_position(get_detective)
 	ingame.game_phase = "ongoing"
 end
 
@@ -84,12 +87,6 @@ function ingame.compose_lookup(mapreader)
 	for _,obstacle in ipairs(mapreader.obstacles) do
 		ingame.add_defined_obstacle_to_lookup(obstacle)
 	end
-end
-
-local function get_detective()
-	local detective_lookup_data = ingame.person_handler.get_person_lookup("Detective")
-
-	return {x=detective_lookup_data[1], y=detective_lookup_data[2]}
 end
 
 local function run_if_ready_to_arrest(func_to_run)
@@ -282,6 +279,9 @@ function ingame.draw()
 	ingame.clue_summary_control.draw(ingame.generate_dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
 	ingame.weather.draw()
 	ingame.mouse_pointer.draw()
+	ingame.clock.paint_light_setting()
+
+	love.graphics.print(ingame.clock.get_clock())
 end
 
 function ingame.generate_dicovered_clues_name_iterator()
@@ -316,6 +316,7 @@ function ingame.update(delta_time, transition_to_menu_state)
 	end
 	)
 	ingame.weather.update()
+	ingame.clock.tick(delta_time)
 end
 
 function ingame.discover_action()

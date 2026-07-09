@@ -4,7 +4,7 @@ local clue_handler = {
 
 function clue_handler.set_clues(clues)
 	clue_handler.clues = clues
-end 
+end
 
 function clue_handler.set_get_player_position(player_position_func)
 	clue_handler.player_position_func = player_position_func
@@ -21,16 +21,15 @@ function clue_handler.can_be_discovered()
 	end
 
 	local all_discovered_clues = get_all_discovered_clues()
-	local matcher = 
-	function(clue) 
-		detective_x, detective_y = clue_handler.player_position_func()
+	local matcher =
+	function(clue)
+		local detective_position = clue_handler.player_position_func()
 
 		if (not clue.is_discovered) and clue_handler.clue_all_dependencies_met(clue, all_discovered_clues) then
 			if clue.discovery_positions and next(clue.discovery_positions) then
 				if clue.discovery_positions then
-					--print("detective_x: "..detective_x.." detective_y: "..detective_y)
 					for i,v in ipairs(clue.discovery_positions) do
-						if v[1] == detective_x and v[2] == detective_y then
+						if v[1] == detective_position.x and v[2] == detective_position.y then
 							return true
 						end
 					end
@@ -57,7 +56,7 @@ function clue_handler.can_be_discovered()
 end
 
 function clue_handler.match_one(matcher)
-	for key, clue in pairs(clue_handler.clues) do
+	for _, clue in pairs(clue_handler.clues) do
 		if matcher(clue) then
 			return clue
 		end
@@ -66,8 +65,8 @@ end
 
 function clue_handler.is_visible_on_the_ground()
 	local all_discovered_clues = get_all_discovered_clues()
-	local matcher = 
-	function(clue) 
+	local matcher =
+	function(clue)
 		return (((not clue.is_discovered) and clue_handler.clue_all_dependencies_met(clue, all_discovered_clues))
 				or (clue.is_discovered and not clue.carried))
 	end
@@ -127,13 +126,13 @@ end
 
 --discover the clue, and add its description to the active descriptions
 function clue_handler.discover_clue(clue)
-	prev_x, prev_y = clue_handler.player_position_func()
+	local prev_detective_pos = clue_handler.player_position_func()
 
 	clue.is_discovered=true
 
 	local continue_description_func = function()
-		detective_x, detective_y = clue_handler.player_position_func()
-		return prev_x == detective_x and prev_y == detective_y
+		local detective_pos = clue_handler.player_position_func()
+		return prev_detective_pos.x == detective_pos.x and prev_detective_pos.y == detective_pos.y
 	end
 
 	active_description_clue = {clue, continue_description_func}
