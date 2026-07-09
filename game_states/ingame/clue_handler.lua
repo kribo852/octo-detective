@@ -28,8 +28,8 @@ function clue_handler.can_be_discovered()
 		if (not clue.is_discovered) and clue_handler.clue_all_dependencies_met(clue, all_discovered_clues) then
 			if clue.discovery_positions and next(clue.discovery_positions) then
 				if clue.discovery_positions then
-					for i,v in ipairs(clue.discovery_positions) do
-						if v[1] == detective_position.x and v[2] == detective_position.y then
+					for _,around_clue_position in ipairs(clue.discovery_positions) do
+						if around_clue_position[1] == detective_position.x and around_clue_position[2] == detective_position.y then
 							return true
 						end
 					end
@@ -38,8 +38,8 @@ function clue_handler.can_be_discovered()
 			end
 
 			if clue.discovery_around then
-				for i,v in ipairs(clue.discovery_around(clue_handler.around_lookup_func)) do -- around_func(name) -> positions[] 
-					if v[1] == detective_x and v[2] == detective_y then
+				for _,around_clue_position in ipairs(clue.discovery_around(clue_handler.around_lookup_func)) do -- around_func(name) -> positions[] 
+					if around_clue_position[1] == detective_position.x and around_clue_position[2] == detective_position.y then
 						return true
 					end
 				end
