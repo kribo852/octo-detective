@@ -281,7 +281,7 @@ function ingame.draw()
 	ingame.mouse_pointer.draw()
 	ingame.clock.paint_light_setting()
 
-	love.graphics.print(ingame.clock.get_clock())
+	love.graphics.print(string.format("%05.2f", ingame.clock.get_clock()))
 end
 
 function ingame.generate_dicovered_clues_name_iterator()

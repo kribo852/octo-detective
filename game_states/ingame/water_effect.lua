@@ -67,7 +67,12 @@ local water_effect = {
         uniform int start_x;
         uniform int start_y;
 
+        vec2 get_random(float ticker) {
+            return vec2(0.02*sin(3.14*ticker), 0.02*cos(3.14*ticker));
+        }
+
         vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+
             float o_x = 3.14*(screen_coords[0] - start_x)/30;
             float o_y = 3.14*(screen_coords[1] - start_y)/30;
 
@@ -75,7 +80,7 @@ local water_effect = {
             float sinef_b = 0.5*sin((ticker - o_x + o_y)*5);
             float sinef_c = 0.5*sin((ticker + o_x - o_y*3));
 
-            vec4 pixelColorAtTexture = Texel(texture, texture_coords);
+            vec4 pixelColorAtTexture = Texel(texture, texture_coords+get_random(ticker+texture_coords.x));
 
             vec4 pixelColor = vec4(
                 mix(0.35, pixelColorAtTexture[0], 0.2 + 0.2 * (sinef_a+sinef_b+sinef_c) ), // R
