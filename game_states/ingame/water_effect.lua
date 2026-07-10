@@ -69,7 +69,7 @@ local water_effect = {
         uniform int start_y;
 
         vec2 get_random(float ticker, float x, float y) {
-            return vec2(0.01*sin(PI*(ticker+x)), 0.01*sin(PI*(ticker+y)));
+            return vec2(0.01*sin(PI/1.6*(ticker+x)), 0.01*cos(PI/1.6*(ticker+y)));
         }
 
         vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {

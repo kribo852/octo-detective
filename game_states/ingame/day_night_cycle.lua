@@ -3,9 +3,9 @@ local day_night_cycle = {}
 
 function day_night_cycle.get_return_object(graphics_mode)
 	graphics_mode = graphics_mode or "simple"
-	clock = 15/24;
+	local clock = 15/24;
 
-	get_darkness_level_color = function()
+	local get_darkness_level_color = function()
 		return 0, 0.025, 0.05, 0.28*(1+math.cos(math.pi*2*clock))
 	end
 
