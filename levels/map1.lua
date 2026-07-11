@@ -58,5 +58,5 @@ make_clue {
 	description = "name<murderer> is the husband of the victim name<victim>, says the officer at the police station.",
 	depends_on = one("suspect"),
 	display_on_ground_image = "call_police_station.png",
-	discovery_positions = { {-2, 19},{0, 19},{-1, 18},{-1, 20} }
+	discovery_around = around("police_car")
 }

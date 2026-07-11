@@ -21,6 +21,7 @@ end
 
 local function meta_draw(elements)
 	return function()
+		love.graphics.scale(math.min(love.graphics.getWidth()/window_initial_width, love.graphics.getHeight()/window_initial_height))
 		local prev_red, prev_green, prev_blue, prev_alpha = love.graphics.getColor()
 		love.graphics.setColor(0.5, 0.5, 0.5)
 		love.graphics.draw(meta_menu.intro_screen, 0, 0, 0, window_initial_width/meta_menu.intro_screen:getWidth(), window_initial_height/meta_menu.intro_screen:getHeight())

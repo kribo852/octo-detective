@@ -1,6 +1,26 @@
 local clue_handler = {
-	active_description_clue = nil --maybe make it a list later on
+
 }
+
+local function get_all_discovered_clues()
+ 	local rtn_list = {}
+
+ 	for key,clue in pairs(clue_handler.clues) do
+ 		if clue.is_discovered then
+ 			rtn_list[clue.name] = true
+ 			--print(clue.name)
+ 		end
+ 	end
+ 	return rtn_list
+end
+
+local function match_one(matcher)
+	for _, clue in pairs(clue_handler.clues) do
+		if matcher(clue) then
+			return clue
+		end
+	end
+end
 
 function clue_handler.set_clues(clues)
 	clue_handler.clues = clues
@@ -16,7 +36,7 @@ function clue_handler.set_around_lookup_function(around_lookup_func)
 end
 
 function clue_handler.can_be_discovered()
-	if active_description_clue ~= nil then
+	if clue_handler.active_description_clue ~= nil then
 		return
 	end
 
@@ -52,15 +72,7 @@ function clue_handler.can_be_discovered()
 		return false
 	end
 
-	return clue_handler.match_one(matcher)
-end
-
-function clue_handler.match_one(matcher)
-	for _, clue in pairs(clue_handler.clues) do
-		if matcher(clue) then
-			return clue
-		end
-	end
+	return match_one(matcher)
 end
 
 function clue_handler.is_visible_on_the_ground()
@@ -107,18 +119,6 @@ function clue_handler.find_all_matching(matcher)
 	return rtn_list
 end
 
-function get_all_discovered_clues()
- 	local rtn_list = {}
-
- 	for key,clue in pairs(clue_handler.clues) do
- 		if clue.is_discovered then
- 			rtn_list[clue.name] = true
- 			--print(clue.name)
- 		end
- 	end
- 	return rtn_list
-end
-
 --discovered is a map where the keys are the names of the clues
 function clue_handler.clue_all_dependencies_met(clue, discovered)
 	return clue.depends_on(discovered)
@@ -135,20 +135,20 @@ function clue_handler.discover_clue(clue)
 		return prev_detective_pos.x == detective_pos.x and prev_detective_pos.y == detective_pos.y
 	end
 
-	active_description_clue = {clue, continue_description_func}
+	clue_handler.active_description_clue = {clue, continue_description_func}
 end
 
 -- run to check and disable active descriptions
 function clue_handler.check_disable_description()
-	if active_description_clue and not active_description_clue[2]() then
-		active_description_clue = nil
+	if clue_handler.active_description_clue and not clue_handler.active_description_clue[2]() then
+		clue_handler.active_description_clue = nil
 	end
 end
 
 -- return a description as text
 function clue_handler.get_active_clue_description()
-	if active_description_clue then
-		return active_description_clue[1].description
+	if clue_handler.active_description_clue then
+		return clue_handler.active_description_clue[1].description
 	end
 end
 

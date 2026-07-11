@@ -2,7 +2,7 @@ local person_handler = {persons = {}}
 
 local function head_toward_direction(wanted_x, wanted_y, current_x, current_y, obstacle_at_position_func)
 	local delta_x = wanted_x - current_x
-	local delta_y = wanted_x - current_y
+	local delta_y = wanted_y - current_y
 	local xdir = 0
 	local ydir = 0
 
@@ -13,11 +13,11 @@ local function head_toward_direction(wanted_x, wanted_y, current_x, current_y, o
 		ydir = delta_y/math.abs(delta_y)
 	end
 
-	if math.abs(delta_x) > math.abs(delta_y) and not obstacle_at_position_func(current_x+xdir, y_pos) then
+	if math.abs(delta_x) > math.abs(delta_y) and not obstacle_at_position_func(current_x + xdir, current_y) then
 			return xdir, 0
 		end
 
-	if math.abs(delta_x) < math.abs(delta_y) and not obstacle_at_position_func(x_pos, current_y+ydir) then
+	if math.abs(delta_x) < math.abs(delta_y) and not obstacle_at_position_func(current_x, current_y + ydir) then
 		return 0, ydir
 	end
 end

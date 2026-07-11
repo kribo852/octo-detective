@@ -10,5 +10,5 @@ add_obstacle {
 }
 add_river {
 	x0_y = 15,
-	run = { {10, "clockwise"}, {7, "counterclockwise"}, {10, "clockwise"}, {5, "crossing"}, {2, "counterclockwise"}, {10, "counterclockwise"} }
+	run = { {10, "clockwise"}, {7, "counterclockwise"}, {10, "clockwise"}, {5, "crossing"}, {2, "counterclockwise"}, {10, "counterclockwise"}, {15, "crossing"} }
 }

@@ -58,7 +58,6 @@ function love.update(delta_time)
 end
 
 function love.draw()
-	love.graphics.scale(math.min(love.graphics.getWidth()/window_initial_width, love.graphics.getHeight()/window_initial_height))
 	game_state_engine.draw({})
 end
 

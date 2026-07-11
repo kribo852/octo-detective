@@ -18,7 +18,8 @@ local ingame = {
 	river_handler = require "game_states.ingame.river_handler",
 	water_effect = require "game_states.ingame.water_effect",
 	noise_generator = require "game_states.ingame.noise_generator",
-	day_night_cycle = require "game_states.ingame.day_night_cycle"
+	day_night_cycle = require "game_states.ingame.day_night_cycle",
+	draw_canvas = love.graphics.newCanvas(window_initial_width, window_initial_height)
 }
 
 local scale = 3
@@ -42,7 +43,7 @@ function ingame.init()
 	for i=1,ingame.size do
 		ingame.obstacles[i] = ingame.obstacles[i] or {} -- to not remove obstacles from map file
 		for j=1,ingame.size do
-			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j) 
+			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j)
 				and not ingame.river_handler.collision_with_river(i, j)
 				and (ingame.tree_generator.smooth_random(i, j, 1) < 0.425 or love.math.random() < 0.1) then
 				ingame.obstacles[i][j] = "tree"..love.math.random(4)
@@ -140,7 +141,7 @@ local function draw_river()
 				local draw_x, draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
 				local draw_x_end, draw_y_end = ingame.d_p_c.calc_end(detective.x, detective.y, i, j)
 				ingame.water_effect.make_water_effect(draw_x, draw_y, draw_x_end, draw_y_end, scale)
-				if ingame.river_handler.collision_with_river(i, j) == "crossing" then 
+				if ingame.river_handler.collision_with_river(i, j) == "crossing" then
 					love.graphics.draw(ingame.image_handler.world_img, ingame.image_handler.crossing_stones,  draw_x, draw_y, 0, scale, scale, 0, 0)
 				end
 			end
@@ -248,7 +249,7 @@ local function draw_ground()
 	for i = math.floor(detective.x)-10, math.floor(detective.x)+10 do
 		for j = math.floor(detective.y)-10, math.floor(detective.y)+10 do
 			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
-			
+
 			if ingame.grass_generator.smooth_random(i, j) > 0.5 then
 				love.graphics.setColor(0.6, 0.6, 0.3) -- dry grass
 			else
@@ -262,9 +263,9 @@ local function draw_ground()
 end
 
 function ingame.draw()
-	--local bg_red, bg_green, bg_blue, bg_alpha = love.graphics.getColor()
+	love.graphics.setCanvas(ingame.draw_canvas)
 	draw_ground()
-	--love.graphics.setColor(bg_red, bg_green, bg_blue, bg_alpha)
+
 	draw_obstacles()
 	draw_river()
 	draw_clues()
@@ -272,15 +273,19 @@ function ingame.draw()
 
 	draw_map_boundary()
 
+	ingame.weather.draw()
+
+	love.graphics.setCanvas()
+	love.graphics.scale(math.min(love.graphics.getWidth()/window_initial_width, love.graphics.getHeight()/window_initial_height))
+	ingame.clock.draw_with_light_setting(ingame.draw_canvas)
+
+	-- not effected by the lighting
 	draw_pick_up_tooltip()
 	draw_object_description()
 	draw_on_victory_or_loss()
 	draw_notification_for_arrest_person()
 	ingame.clue_summary_control.draw(ingame.generate_dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
-	ingame.weather.draw()
 	ingame.mouse_pointer.draw()
-	ingame.clock.paint_light_setting()
-
 	love.graphics.print(string.format("%05.2f", ingame.clock.get_clock()))
 end
 
