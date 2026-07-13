@@ -102,11 +102,6 @@ function clue_handler.is_visible_on_the_ground()
 	return rtn_stripped_clue_information
 end
 
-function clue_handler.get_discovered_summary()
-	local matcher = function(clue) return clue.is_discovered end
-	return clue_handler.find_all_matching(matcher)
-end
-
 function clue_handler.find_all_matching(matcher)
 	local rtn_list = {}
 

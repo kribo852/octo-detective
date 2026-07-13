@@ -7,7 +7,6 @@ local ingame = {
 	detective = {facing_direction = 1},
 	clues_images = {},
 	clue_handler = require "game_states.ingame.clue_handler",
-	clue_summary_control = require "game_states.ingame.clue_summary_control",
 	mouse_pointer = require "game_states.mouse_pointer",
 	d_p_c = require "game_states.ingame.draw_position_calculator",
 	image_handler = require "game_states.ingame.image_handler",
@@ -37,6 +36,7 @@ function ingame.init()
 	ingame.grass_generator = ingame.noise_generator.new_random_func(2)
 	ingame.tree_generator = ingame.noise_generator.new_random_func(1)
 	ingame.clock = ingame.day_night_cycle.get_return_object()
+	ingame.control_panel = require("game_states.ingame.control_panel").get_control_panel()
 
 	ingame.read_from_mapreader()
 
@@ -91,10 +91,9 @@ function ingame.compose_lookup(mapreader)
 end
 
 local function run_if_ready_to_arrest(func_to_run)
-	local discovered_clues = ingame.clue_handler.get_discovered_summary()
-	local index = ingame.clue_summary_control.get_selected_index()
+	local selected_clue = ingame.control_panel.get_selected_index()
 
-	if #discovered_clues > 0 and discovered_clues[index] and discovered_clues[index].type == "person" and
+	if selected_clue and selected_clue.type == "person" and
 		ingame.game_phase=="ongoing" then
 			func_to_run()
 	end
@@ -284,21 +283,9 @@ function ingame.draw()
 	draw_object_description()
 	draw_on_victory_or_loss()
 	draw_notification_for_arrest_person()
-	ingame.clue_summary_control.draw(ingame.generate_dicovered_clues_name_iterator(), ingame.clue_summary_image_getter)
+	ingame.control_panel.control_panel_draw(ingame.clue_summary_image_getter)
 	ingame.mouse_pointer.draw()
 	love.graphics.print(string.format("%05.2f", ingame.clock.get_clock()))
-end
-
-function ingame.generate_dicovered_clues_name_iterator()
-	local index = 0
-	local discovered_clues = ingame.clue_handler.get_discovered_summary()
-
-	return function()
-		index=index+1
-		if index <= #discovered_clues then
-			return index,discovered_clues[index].name
-		end
-	end
 end
 
 function ingame.clue_summary_image_getter(image_name)
@@ -313,13 +300,14 @@ function ingame.update(delta_time, transition_to_menu_state)
 	ingame.discover_action()
 
 	ingame.clue_handler.check_disable_description()
-	ingame.clue_summary_control.check_for_clue_clicked()
+	--ingame.clue_summary_control.check_for_clue_clicked()
 	ingame.call_police_station_if_person_selected()
 	ingame.person_handler.move(delta_time, function(x_pos, y_pos)
 		return ingame.obstacles[x_pos] and ingame.obstacles[x_pos][y_pos] or
 		ingame.river_handler.collision_with_river(x_pos, y_pos)=="river"
 	end
 	)
+	ingame.control_panel.update()
 	ingame.weather.update()
 	ingame.clock.tick(delta_time)
 end
@@ -328,6 +316,7 @@ function ingame.discover_action()
 	local tmp_clue = ingame.clue_handler.can_be_discovered()
 	if tmp_clue and debounce_keyboard.check("space") then
 		ingame.clue_handler.discover_clue(tmp_clue)
+		ingame.control_panel.add_clue(tmp_clue)
 	end
 end
 
@@ -348,13 +337,12 @@ function ingame.add_defined_obstacle_to_lookup(obstacle)
 end
 
 function ingame.call_police_station_if_person_selected()
-	local discovered_clues = ingame.clue_handler.get_discovered_summary()
-	local index = ingame.clue_summary_control.get_selected_index()
+	local selected_clue = ingame.control_panel.get_selected_index()
 
 	run_if_ready_to_arrest(function()
 		if ingame.at_defined_obstacle("police_car") then
 			if debounce_keyboard.check("space") then
-				if discovered_clues[index].is_murderer then
+				if selected_clue.is_murderer then
 					ingame.game_phase="victory"
 					ingame.level_saver.save(cur_level, "Case completed")
 					ingame.theme_handler.play("victory")
