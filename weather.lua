@@ -28,9 +28,9 @@ end
 
 function weather.draw()
 	local r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(0.1, 0.15, 0.2, 0.16)
+	love.graphics.setColor(0.1, 0.15, 0.2, 0.12)
 	local prev_line_width = love.graphics.getLineWidth()
-	love.graphics.setLineWidth(2)
+	love.graphics.setLineWidth(5)
 
 	for index,particle in ipairs(weather) do
 		love.graphics.line( particle.x, particle.y, particle.x, particle.y-20 )

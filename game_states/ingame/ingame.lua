@@ -251,9 +251,9 @@ local function draw_ground()
 			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
 
 			if ingame.grass_generator.smooth_random(i, j) > 0.5 then
-				love.graphics.setColor(0.6, 0.6, 0.3) -- dry grass
+				love.graphics.setColor(0.45, 0.5, 0.25) -- dry grass
 			else
-				love.graphics.setColor(0.15, 0.4, 0.25)
+				love.graphics.setColor(0.3, 0.5, 0.25)
 			end
 			love.graphics.draw(ingame.grass_texture, draw_x_start, draw_y_start, 0, scale, scale)
 		end

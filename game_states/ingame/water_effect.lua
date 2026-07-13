@@ -106,10 +106,6 @@ function water_effect.make_water_effect(start_x, start_y, end_x, end_y, scale)
 end
 
 function water_effect.load()
-	--local canvas = love.graphics.newCanvas(60, 60)
-	--love.graphics.setCanvas(canvas)
-    --love.graphics.clear(0.5, 0.3, 0)
-    --love.graphics.setCanvas()
 
 	water_effect.shader = love.graphics.newShader(shader3)
 	water_effect.background_image = love.graphics.newImage("assets/river_bottom.png")
