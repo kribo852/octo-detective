@@ -1,4 +1,7 @@
-local person_handler = {persons = {}}
+local person_handler = {
+	info_share = require "info_share",
+	persons = {}
+}
 
 local function head_toward_direction(wanted_x, wanted_y, current_x, current_y, obstacle_at_position_func)
 	local delta_x = wanted_x - current_x
@@ -27,9 +30,11 @@ local function stroll_behaviour(obstacle_at_position_func, x_pos, y_pos)
 		return nil
 	end
 
-	if x_pos<=0 or y_pos <= 0 or x_pos>person_handler.map_size or y_pos>person_handler.map_size then -- outside the map
-		local middle_map_x = person_handler.map_size/2
-		local middle_map_y = person_handler.map_size/2
+	local map_size = person_handler.info_share.get_game_info("map_size")()
+
+	if x_pos <= 0 or y_pos <= 0 or x_pos > map_size or y_pos > map_size then -- outside the map
+		local middle_map_x = map_size/2
+		local middle_map_y = map_size/2
 
 		return head_toward_direction(middle_map_x, middle_map_y, x_pos, y_pos, obstacle_at_position_func)
 	end
@@ -155,10 +160,6 @@ function person_handler.set_persons(persons)
 			 facing=1
 			})
 	end
-end
-
-function person_handler.set_map_size(map_size)
-	person_handler.map_size = map_size
 end
 
 function person_handler.get_person_lookup(name)

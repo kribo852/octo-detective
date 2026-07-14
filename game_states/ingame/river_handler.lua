@@ -1,7 +1,7 @@
 --this file handles a single river, it tells the ingame where the parts of the river are  
 
 local river_handler = {
-
+	info_share = require "info_share"
 }
 
 local river_constant = "river"
@@ -147,9 +147,12 @@ local function post_set_outside_map(c_x, c_y, map_size)
 
 end
 
-function river_handler.set_river(river, map_size)
+function river_handler.set_river()
 	river_handler.collision_with_river = function (x_pos, y_pos) return nil end
 	river_handler.inside_map_lookup = {}
+
+	local river = river_handler.info_share.get_game_info("river")()
+	local map_size = river_handler.info_share.get_game_info("map_size")()
 
 	if not river then
 		return

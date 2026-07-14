@@ -18,6 +18,7 @@ local ingame = {
 	water_effect = require "game_states.ingame.water_effect",
 	noise_generator = require "game_states.ingame.noise_generator",
 	day_night_cycle = require "game_states.ingame.day_night_cycle",
+	info_share = require "info_share",
 	draw_canvas = love.graphics.newCanvas(window_initial_width, window_initial_height)
 }
 
@@ -40,9 +41,11 @@ function ingame.init()
 
 	ingame.read_from_mapreader()
 
-	for i=1,ingame.size do
+	local size = ingame.info_share.get_game_info("map_size")()
+
+	for i=1,size do
 		ingame.obstacles[i] = ingame.obstacles[i] or {} -- to not remove obstacles from map file
-		for j=1,ingame.size do
+		for j=1,size do
 			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j)
 				and not ingame.river_handler.collision_with_river(i, j)
 				and (ingame.tree_generator.smooth_random(i, j, 1) < 0.425 or love.math.random() < 0.1) then
@@ -60,8 +63,6 @@ function ingame.read_from_mapreader()
 	mapreader.readfile(cur_level)
 
 	ingame.depends_on = mapreader.depends_on
-	ingame.size = mapreader.size
-	print("map size: "..ingame.size)
 
 	local clues = {}
 
@@ -79,9 +80,12 @@ function ingame.read_from_mapreader()
 	ingame.compose_lookup(mapreader)
 	ingame.clue_handler.set_clues(clues)
 	ingame.person_handler.set_persons(mapreader.persons)
-	ingame.person_handler.set_map_size(ingame.size)
 	ingame.clue_handler.set_around_lookup_function(ingame.make_around_function(ingame.person_handler.get_person_lookup, ingame.obstacle_lookup))
-	ingame.river_handler.set_river(mapreader.get_river(), ingame.size)
+	ingame.river_handler.set_river()
+end
+
+function ingame.tear_down()
+	ingame.info_share.clear()
 end
 
 function ingame.compose_lookup(mapreader)
@@ -222,18 +226,19 @@ local function draw_map_boundary()
 
 			local draw_x_start,draw_y_start = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
 			local draw_x_end,draw_y_end = ingame.d_p_c.calc_end(detective.x, detective.y, i, j)
+			local size = ingame.info_share.get_game_info("map_size")()
 
-			if i == 1 and j > 0 and j<=ingame.size then
+			if i == 1 and j > 0 and j<=size then
 				love.graphics.line(draw_x_start, draw_y_start, draw_x_start, draw_y_end)
 			end
-			if i == ingame.size and j > 0 and j<=ingame.size then
+			if i == size and j > 0 and j<=size then
 				love.graphics.line(draw_x_end, draw_y_start, draw_x_end, draw_y_end)
 			end
 
-			if j == 1 and i > 0 and i<=ingame.size then
+			if j == 1 and i > 0 and i<=size then
 				love.graphics.line(draw_x_start, draw_y_start, draw_x_end, draw_y_start)
 			end
-			if j == ingame.size and i > 0 and i<=ingame.size then
+			if j == size and i > 0 and i<=size then
 				love.graphics.line(draw_x_start, draw_y_end, draw_x_end, draw_y_end)
 			end
 		end
@@ -284,7 +289,7 @@ function ingame.draw()
 	draw_on_victory_or_loss()
 	draw_notification_for_arrest_person()
 	ingame.control_panel.control_panel_draw(ingame.clue_summary_image_getter)
-	ingame.control_panel.draw_minimap(get_detective, ingame.size)
+	ingame.control_panel.draw_minimap(get_detective)
 	ingame.mouse_pointer.draw()
 	love.graphics.print(string.format("%05.2f", ingame.clock.get_clock()))
 end

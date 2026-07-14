@@ -30,7 +30,7 @@ make_clue {
 	name = "skeleton",
 	type = "object",
 	is_discovered = false,
-	carried = true,
+	carried = false,
 	image = "skeleton.png",
 	description = "A skeleton, just as the caller said earlier, when calling the police station. I must find out who this person was.",
 	depends_on = none(),

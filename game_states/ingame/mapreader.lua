@@ -1,7 +1,8 @@
 -- clues can be objects, persons or footprint
 
 local mapreader = {
-	name_generator = require "name_generator"
+	name_generator = require "name_generator",
+	info_share = require "info_share"
 }
 
 function mapreader.make_clue(clue)
@@ -22,7 +23,8 @@ function mapreader.make_clue(clue)
 end
 
 function mapreader.set_size(size_table)
-	mapreader.size = size_table.size
+	print("map size: "..size_table.size)
+	mapreader.info_share.register_game_info("map_size", function() return size_table.size end)
 end
 
 function mapreader.set_detective(detective)
@@ -46,20 +48,13 @@ function mapreader.around(name)
 end
 
 function mapreader.add_river(river)
-	mapreader.river = river
+	mapreader.info_share.register_game_info("river", function() return river end)
 end
-
-function mapreader.get_river()
-	return mapreader.river
-end
-
 
 function mapreader.readfile(filename)
 	mapreader.clues = {} -- clear previous data
 	mapreader.obstacles = {}
 	mapreader.persons = {}
-	mapreader.river = nil
-	mapreader.size = nil
 	mapreader.name_generator.reset()
 
 	loadfile ("levels/"..filename, "t",
@@ -85,7 +80,7 @@ end
 function mapreader.one_clues( ... )
 	local collect = {...}
 	return function(names_of_discovered_clues)
-		for index,value in ipairs(collect) do
+		for _,value in ipairs(collect) do
 			if type(value) == "string" then
 				if names_of_discovered_clues[value] then
 					return true
@@ -103,7 +98,7 @@ end
 function mapreader.all_clues( ... )
 	local collect = {...}
 	return function(names_of_discovered_clues)
-		for index,value in ipairs(collect) do
+		for _,value in ipairs(collect) do
 			if type(value) == "string" then
 				if not names_of_discovered_clues[value] then
 					return false
