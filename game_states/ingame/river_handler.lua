@@ -162,6 +162,7 @@ function river_handler.set_river()
  	local c_x, c_y = make_inside_map_river(river, map_size)
  	post_set_outside_map(c_x, c_y, map_size)
 
+ 	river_handler.info_share.register_game_info("river_lookup", river_handler.collision_with_river)
 end
 
 return river_handler

@@ -41,6 +41,8 @@ local function control_panel_draw(ordered_clues, image_getter)
 			love.graphics.printf(ordered_clues[tmp_info_selected].description, start_of_sidebar-200, place.y, 200)
 		end
 	end
+	love.graphics.print(string.format("%05.2f", control_panel.info_share.get_game_info("clock")()),
+    start_of_sidebar + 100, window_initial_height - 100)
 end
 
 local function draw_minimap(get_player_position)

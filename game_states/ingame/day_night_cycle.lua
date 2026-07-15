@@ -1,6 +1,7 @@
 local day_night_cycle = {
 	seconds_per_day = 600,
-	clock_hours = 24
+	clock_hours = 24,
+	info_share = require "info_share"
 }
 
 function day_night_cycle.get_return_object(graphics_mode)
@@ -22,11 +23,10 @@ function day_night_cycle.get_return_object(graphics_mode)
 	end
 
 	return {
-		get_clock = function() return day_night_cycle.clock_hours*(clock%1) end,
 		tick = function (delta_time)
 			clock = clock + delta_time / day_night_cycle.seconds_per_day
+			day_night_cycle.info_share.register_game_info("clock", function() return (clock%1)*day_night_cycle.clock_hours end)
 		end,
-
 		draw_with_light_setting = draw_with_light_setting_simple
 	}
 end

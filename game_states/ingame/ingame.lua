@@ -291,7 +291,6 @@ function ingame.draw()
 	ingame.control_panel.control_panel_draw(ingame.clue_summary_image_getter)
 	ingame.control_panel.draw_minimap(get_detective)
 	ingame.mouse_pointer.draw()
-	love.graphics.print(string.format("%05.2f", ingame.clock.get_clock()))
 end
 
 function ingame.clue_summary_image_getter(image_name)
