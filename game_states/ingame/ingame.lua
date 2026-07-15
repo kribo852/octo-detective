@@ -79,7 +79,7 @@ function ingame.read_from_mapreader()
 
 	ingame.compose_lookup(mapreader)
 	ingame.clue_handler.set_clues(clues)
-	ingame.person_handler.set_persons(mapreader.persons)
+	ingame.person_handler.set_persons()
 	ingame.clue_handler.set_around_lookup_function(ingame.make_around_function(ingame.person_handler.get_person_lookup, ingame.obstacle_lookup))
 	ingame.river_handler.set_river()
 end

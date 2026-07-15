@@ -147,9 +147,9 @@ function person_handler.move(delta_time, obstacle_at_position_func)
 	end
 end
 
-function person_handler.set_persons(persons)
+function person_handler.set_persons()
 	person_handler.persons = {}
-	for _,person in ipairs(persons) do
+	for _,person in ipairs(person_handler.info_share.get_game_info("persons")()) do
 		table.insert(person_handler.persons,
 			{
 			 x=person.position.x,

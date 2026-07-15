@@ -1,4 +1,4 @@
--- clues can be objects, persons or footprint
+-- clues can be objects, persons or footprints
 
 local mapreader = {
 	name_generator = require "name_generator",
@@ -27,16 +27,16 @@ function mapreader.set_size(size_table)
 	mapreader.info_share.register_game_info("map_size", function() return size_table.size end)
 end
 
-function mapreader.set_detective(detective)
-	mapreader.add_person({name = "Detective", type = "detective", behaviour = "player", position = detective.position})
+function mapreader.set_detective(detective, persons)
+	mapreader.add_person({name = "Detective", type = "detective", behaviour = "player", position = detective.position}, persons)
 end
 
 function mapreader.add_obstacle(obstacle)
 	table.insert(mapreader.obstacles, {type=obstacle.type, position={x=obstacle.position.x, y=obstacle.position.y}})
 end
 
-function mapreader.add_person(person)
-	table.insert(mapreader.persons, {name=mapreader.name_tokens(person.name), type=person.type, behaviour=person.behaviour, position=person.position})--name, type, behaviour, position
+function mapreader.add_person(person, persons)
+	table.insert(persons, {name=mapreader.name_tokens(person.name), type=person.type, behaviour=person.behaviour, position=person.position})--name, type, behaviour, position
 end
 
 function mapreader.around(name)
@@ -54,16 +54,16 @@ end
 function mapreader.readfile(filename)
 	mapreader.clues = {} -- clear previous data
 	mapreader.obstacles = {}
-	mapreader.persons = {}
+	local persons = {}
 	mapreader.name_generator.reset()
 
 	loadfile ("levels/"..filename, "t",
 		{
 			set_size=mapreader.set_size,
 			make_clue=mapreader.make_clue,
-			set_detective=mapreader.set_detective,
+			set_detective=function(person) mapreader.set_detective(person, persons) end,
 			add_obstacle=mapreader.add_obstacle,
-			add_person=mapreader.add_person,
+			add_person=function(person) mapreader.add_person(person, persons) end,
 			around=mapreader.around,
 			none=mapreader.none_clues,
 			one=mapreader.one_clues,
@@ -71,6 +71,7 @@ function mapreader.readfile(filename)
 			add_river=mapreader.add_river
 		}
 	)()
+	mapreader.info_share.register_game_info("persons", function() return persons end)
 end
 
 function mapreader.none_clues()
