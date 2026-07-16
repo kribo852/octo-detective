@@ -46,9 +46,12 @@ local function control_panel_draw(ordered_clues, image_getter)
 end
 
 local function draw_minimap(get_player_position)
+	local prev_r,prev_g,prev_b = love.graphics.getColor()
+	love.graphics.setColor(0.7, 1, 1, 0.25)
 	local map_size = control_panel.info_share.get_game_info("map_size")()
 	local player_position = get_player_position()
 	love.graphics.rectangle("line", start_of_sidebar, window_initial_height - 100, map_size, map_size)
+	love.graphics.setColor(prev_r, prev_g, prev_b)
 	love.graphics.points(start_of_sidebar + player_position.x, window_initial_height - 100 + player_position.y)
 end
 

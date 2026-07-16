@@ -46,9 +46,10 @@ function ingame.init()
 	for i=1,size do
 		ingame.obstacles[i] = ingame.obstacles[i] or {} -- to not remove obstacles from map file
 		for j=1,size do
+			local chance_for_tree = ingame.tree_generator.smooth_random(i, j)
 			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j)
 				and not ingame.river_handler.collision_with_river(i, j)
-				and (ingame.tree_generator.smooth_random(i, j, 1) < 0.425 or love.math.random() < 0.1) then
+				and (chance_for_tree < 0.5 and (i+j) % 2 == 0) then
 				ingame.obstacles[i][j] = "tree"..love.math.random(4)
 			end
 		end
