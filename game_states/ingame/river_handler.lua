@@ -58,7 +58,7 @@ local function make_inside_map_river(river, map_size)
 	local current_x, current_y;
 	local current_clause = 1
 	local countdown = river.run[current_clause] and river.run[current_clause][1]
-	local direction_x 
+	local direction_x
 	local direction_y
 
 	if river.x0_y then
@@ -114,7 +114,7 @@ local function post_set_outside_map(c_x, c_y, map_size)
 	local prev_func = river_handler.collision_with_river
 
 	if(c_x == 0) then
-		river_handler.collision_with_river = function(x, y) 
+		river_handler.collision_with_river = function(x, y)
 			if x < 1 and y == c_y then return river_constant end
 
 			return prev_func(x, y)
@@ -122,7 +122,7 @@ local function post_set_outside_map(c_x, c_y, map_size)
 	end
 
 	if(c_x == map_size + 1) then
-		river_handler.collision_with_river = function(x, y) 
+		river_handler.collision_with_river = function(x, y)
 			if x > map_size and y == c_y then return river_constant end
 
 			return prev_func(x, y)
@@ -130,7 +130,7 @@ local function post_set_outside_map(c_x, c_y, map_size)
 	end
 
 	if(c_y == 0) then
-		river_handler.collision_with_river = function(x, y) 
+		river_handler.collision_with_river = function(x, y)
 			if y < 1 and x == c_x then return river_constant end
 
 			return prev_func(x, y)
@@ -138,13 +138,26 @@ local function post_set_outside_map(c_x, c_y, map_size)
 	end
 
 	if(c_y == map_size + 1) then
-		river_handler.collision_with_river = function(x, y) 
+		river_handler.collision_with_river = function(x, y)
 			if y > map_size and x == c_x then return river_constant end
 
 			return prev_func(x, y)
 		end
 	end
+end
 
+local function add_river_as_parts()
+	local map_size = river_handler.info_share.get_game_info("map_size")()
+	local parts = {}
+
+	for i=1,map_size do
+		for j=1,map_size do
+			if river_handler.collision_with_river(i, j) then
+				table.insert(parts, {x=i, y=j})
+			end
+		end
+	end
+	river_handler.info_share.register_game_info("river_parts", function() return parts end)
 end
 
 function river_handler.set_river()
@@ -162,7 +175,7 @@ function river_handler.set_river()
  	local c_x, c_y = make_inside_map_river(river, map_size)
  	post_set_outside_map(c_x, c_y, map_size)
 
- 	river_handler.info_share.register_game_info("river_lookup", river_handler.collision_with_river)
+ 	add_river_as_parts()
 end
 
 return river_handler

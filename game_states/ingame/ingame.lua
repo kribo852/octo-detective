@@ -24,16 +24,10 @@ local ingame = {
 
 local scale = 3
 
-local function get_detective()
-	local detective_lookup_data = ingame.person_handler.get_person_lookup("Detective")
-
-	return {x=detective_lookup_data[1], y=detective_lookup_data[2]}
-end
-
 function ingame.init()
 	ingame.water_effect.load()
 	ingame.obstacles = {}
-	ingame.obstacle_lookup = function(name) return nil end -- fresh lookup function for obstacles
+	ingame.obstacle_lookup = function(name) return nil end -- fresh lookup function for obstacles, this is for obstacles named in the map file
 	ingame.grass_generator = ingame.noise_generator.new_random_func(2)
 	ingame.tree_generator = ingame.noise_generator.new_random_func(1)
 	ingame.clock = ingame.day_night_cycle.get_return_object()
@@ -54,7 +48,7 @@ function ingame.init()
 			end
 		end
 	end
-	ingame.clue_handler.set_get_player_position(get_detective)
+	ingame.clue_handler.set_get_player_position(ingame.info_share.game_info.detective_position)
 	ingame.game_phase = "ongoing"
 end
 
@@ -106,7 +100,7 @@ end
 
 local function draw_persons()
 	for _,person in ipairs(ingame.person_handler.persons) do
-		local draw_x,draw_y = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, person.x, person.y, true)
+		local draw_x,draw_y = ingame.d_p_c.calc_start(ingame.info_share.game_info.detective_position().x, ingame.info_share.game_info.detective_position().y, person.x, person.y, true)
 		if person.type == "person" then
 			love.graphics.draw(ingame.person_image, draw_x, draw_y, 0, scale*person.facing, scale, 10, 10)
 		end
@@ -117,7 +111,7 @@ local function draw_persons()
 end
 
 local function draw_obstacles()
-	local detective = get_detective()
+	local detective = ingame.info_share.game_info.detective_position()
 
 	-- for obstacles
 	for i = math.floor(detective.x)-10 , math.floor(detective.x)+10 do
@@ -137,7 +131,7 @@ local function draw_obstacles()
 end
 
 local function draw_river()
-	local detective = get_detective()
+	local detective = ingame.info_share.game_info.detective_position()
 
 	for i = math.floor(detective.x)-10, math.floor(detective.x)+10 do
 		for j = math.floor(detective.y)-10, math.floor(detective.y)+10 do
@@ -175,12 +169,13 @@ end
 
 local function draw_clues()
 	local to_be_drawn_on_ground_clue_positions = ingame.clue_handler.is_visible_on_the_ground()
+	local detective_position = ingame.info_share.game_info.detective_position()
 
 	for _,position in ipairs(to_be_drawn_on_ground_clue_positions) do
 		local image = ingame.clues_images[position.name]["display_on_ground_image"] or ingame.clues_images[position.name]["image"]
 		local origin = image:getWidth()/2
 
-		local draw_x,draw_y = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, position.pos_x, position.pos_y, true)
+		local draw_x,draw_y = ingame.d_p_c.calc_start(detective_position.x, detective_position.y, position.pos_x, position.pos_y, true)
 
 		love.graphics.draw(image, draw_x, draw_y, 0, scale, scale, origin, origin)
 	end
@@ -196,12 +191,11 @@ local function draw_on_victory_or_loss()
 end
 
 local function draw_notification_for_arrest_person()
-
-	local around_func = ingame.make_around_function(ingame.obstacle_lookup)
-
 	run_if_ready_to_arrest(function()
+		local around_func = ingame.make_around_function(ingame.obstacle_lookup)
+		local detective_position = ingame.info_share.game_info.detective_position()
 		for _,value in ipairs(around_func("police_car")) do
-			local draw_x,draw_y = ingame.d_p_c.calc_start(get_detective().x, get_detective().y, value[1], value[2], true)
+			local draw_x,draw_y = ingame.d_p_c.calc_start(detective_position.x, detective_position.y, value[1], value[2], true)
 
 			love.graphics.draw(ingame.mobile_phone_image, draw_x, draw_y,  0, scale, scale, 10, 10)
 		end
@@ -213,7 +207,7 @@ local function draw_notification_for_arrest_person()
 end
 
 local function draw_map_boundary()
-	local detective = get_detective()
+	local detective = ingame.info_share.game_info.detective_position()
 	local prev_red, prev_green, prev_blue = love.graphics.getColor()
 
 	for i = math.floor(detective.x)-10, math.floor(detective.x)+10 do
@@ -248,7 +242,7 @@ local function draw_map_boundary()
 end
 
 local function draw_ground()
-	local detective = get_detective()
+	local detective = ingame.info_share.game_info.detective_position()
 	local r, g, b = love.graphics.getColor()
 
 	for i = math.floor(detective.x)-10, math.floor(detective.x)+10 do
@@ -290,7 +284,7 @@ function ingame.draw()
 	draw_on_victory_or_loss()
 	draw_notification_for_arrest_person()
 	ingame.control_panel.control_panel_draw(ingame.clue_summary_image_getter)
-	ingame.control_panel.draw_minimap(get_detective)
+	ingame.control_panel.draw_minimap()
 	ingame.mouse_pointer.draw()
 end
 
@@ -362,7 +356,7 @@ function ingame.call_police_station_if_person_selected()
 end
 
 function ingame.at_defined_obstacle(obstacle)
-	local detective = get_detective()
+	local detective = ingame.info_share.game_info.detective_position()
 	local obstacle_position = ingame.obstacle_lookup(obstacle)
 
 	return obstacle_position and math.abs(detective.x - obstacle_position[1]) + math.abs(detective.y - obstacle_position[2]) == 1

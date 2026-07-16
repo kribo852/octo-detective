@@ -160,6 +160,14 @@ function person_handler.set_persons()
 			 facing=1
 			})
 	end
+
+	person_handler.info_share.register_game_info("detective_position",
+		function()
+			local detective = person_handler.get_person_lookup("Detective")
+			return { x = detective[1], y = detective[2] }
+		end
+	)
+
 end
 
 function person_handler.get_person_lookup(name)

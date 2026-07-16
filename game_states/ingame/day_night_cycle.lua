@@ -9,8 +9,8 @@ function day_night_cycle.get_return_object(graphics_mode)
 	local clock = 15/day_night_cycle.clock_hours
 
 	local get_darkness_level_color = function()
-		return (1-0.4)+0.4*math.cos(math.pi+math.pi*2*clock),
-			   (1-0.4)+0.4*math.cos(math.pi+math.pi*2*clock),
+		return (1-0.35)+0.35*math.cos(math.pi+math.pi*2*clock),
+			   (1-0.35)+0.35*math.cos(math.pi+math.pi*2*clock),
 			   (1-0.3)+0.3*math.cos(math.pi+math.pi*2*clock)
 	end
 

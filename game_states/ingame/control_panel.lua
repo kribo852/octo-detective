@@ -4,6 +4,7 @@ local control_panel = {
 local slot_size = 60
 local selected = 1
 local start_of_sidebar = window_initial_width - 200
+local minimap_size = 100
 
 local function get_index_from_mouse()
 	return 1 + math.floor((love.mouse.getX()-start_of_sidebar)/slot_size) + 3*math.floor(love.mouse.getY()/slot_size)
@@ -29,30 +30,46 @@ local function control_panel_draw(ordered_clues, image_getter)
 		love.graphics.draw(image, place.x, place.y, 0, scale, scale)
 	end
 
-	love.graphics.setColor(0.7, 1, 1, 0.25)
-	local place = get_place_in_inventory_from_index(selected)
-	love.graphics.rectangle("line", place.x , place.y, slot_size, slot_size)
-	love.graphics.setColor(prev_r,prev_g,prev_b)
+	do
+		love.graphics.setColor(0.7, 1, 1, 0.25)
+		local place = get_place_in_inventory_from_index(selected)
+		love.graphics.rectangle("line", place.x , place.y, slot_size, slot_size)
+		love.graphics.setColor(prev_r,prev_g,prev_b)
+	end
 
 	if love.mouse.getX() > start_of_sidebar then
-		local tmp_info_selected = get_index_from_mouse()
-		local place = get_place_in_inventory_from_index(get_index_from_mouse())
-		if ordered_clues[tmp_info_selected] then
-			love.graphics.printf(ordered_clues[tmp_info_selected].description, start_of_sidebar-200, place.y, 200)
+		local tmp_index_selected = get_index_from_mouse()
+		local place = get_place_in_inventory_from_index(tmp_index_selected)
+		if ordered_clues[tmp_index_selected] then
+			love.graphics.printf(ordered_clues[tmp_index_selected].description, start_of_sidebar-200, place.y, 200)
 		end
 	end
 	love.graphics.print(string.format("%05.2f", control_panel.info_share.get_game_info("clock")()),
     start_of_sidebar + 100, window_initial_height - 100)
 end
 
-local function draw_minimap(get_player_position)
+local function draw_minimap()
 	local prev_r,prev_g,prev_b = love.graphics.getColor()
-	love.graphics.setColor(0.7, 1, 1, 0.25)
 	local map_size = control_panel.info_share.get_game_info("map_size")()
-	local player_position = get_player_position()
-	love.graphics.rectangle("line", start_of_sidebar, window_initial_height - 100, map_size, map_size)
+	local player_position = control_panel.info_share.game_info.detective_position()
+	local scale = minimap_size/map_size
+
+	love.graphics.setColor(0,0,0)
+	love.graphics.rectangle("fill", start_of_sidebar, window_initial_height - minimap_size, minimap_size, minimap_size)
+	love.graphics.setColor(0.7, 1, 1, 0.25)
+	love.graphics.rectangle("line", start_of_sidebar, window_initial_height - minimap_size, minimap_size, minimap_size)
+
+	love.graphics.setColor(0, 0, 0.5) --river
+	for _,val in ipairs(control_panel.info_share.game_info.river_parts() or {}) do
+		love.graphics.rectangle("fill", start_of_sidebar + ( val.x-1 )*scale, window_initial_height - minimap_size + ( val.y-1 )*scale, 
+			scale, scale)
+	end
+
+	love.graphics.setColor(0.2, 0.5, 0) --player
+	love.graphics.rectangle("fill", start_of_sidebar + (player_position.x - 1)*scale,
+		window_initial_height - minimap_size + (player_position.y - 1)*scale, scale, scale)
+
 	love.graphics.setColor(prev_r, prev_g, prev_b)
-	love.graphics.points(start_of_sidebar + player_position.x, window_initial_height - 100 + player_position.y)
 end
 
 local function update_index()
