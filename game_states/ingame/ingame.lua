@@ -43,7 +43,7 @@ function ingame.init()
 			local chance_for_tree = ingame.tree_generator.smooth_random(i, j)
 			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j)
 				and not ingame.river_handler.collision_with_river(i, j)
-				and (chance_for_tree < 0.5 and (i+j) % 2 == 0) then
+				and (love.math.random() < 0.275 ) then
 				ingame.obstacles[i][j] = "tree"..love.math.random(4)
 			end
 		end
@@ -73,6 +73,7 @@ function ingame.read_from_mapreader()
 	end
 
 	ingame.compose_lookup(mapreader)
+	ingame.info_share.register_game_info("obstacle_lookup", ingame.obstacle_lookup)
 	ingame.clue_handler.set_clues(clues)
 	ingame.person_handler.set_persons()
 	ingame.clue_handler.set_around_lookup_function(ingame.make_around_function(ingame.person_handler.get_person_lookup, ingame.obstacle_lookup))

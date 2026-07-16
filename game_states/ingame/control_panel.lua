@@ -46,6 +46,8 @@ local function control_panel_draw(ordered_clues, image_getter)
 	end
 	love.graphics.print(string.format("%05.2f", control_panel.info_share.get_game_info("clock")()),
     start_of_sidebar + 100, window_initial_height - 100)
+
+	love.graphics.print("fps "..love.timer.getFPS(), start_of_sidebar + 100, window_initial_height - 80)
 end
 
 local function draw_minimap()
@@ -61,9 +63,16 @@ local function draw_minimap()
 
 	love.graphics.setColor(0, 0, 0.5) --river
 	for _,val in ipairs(control_panel.info_share.game_info.river_parts() or {}) do
-		love.graphics.rectangle("fill", start_of_sidebar + ( val.x-1 )*scale, window_initial_height - minimap_size + ( val.y-1 )*scale, 
+		love.graphics.rectangle("fill", start_of_sidebar + ( val.x-1 )*scale, window_initial_height - minimap_size + ( val.y-1 )*scale,
 			scale, scale)
 	end
+
+	local police_car = control_panel.info_share.game_info.obstacle_lookup("police_car")
+	local car_norm_x = math.min(math.max(police_car[1], 1), map_size)
+	local car_norm_y = math.min(math.max(police_car[2], 1), map_size)
+	love.graphics.setColor(1, 0, 0)
+	love.graphics.rectangle("fill", start_of_sidebar + ( car_norm_x-1 )*scale,
+		window_initial_height - minimap_size + ( car_norm_y-1 )*scale, scale, scale)
 
 	love.graphics.setColor(0.2, 0.5, 0) --player
 	love.graphics.rectangle("fill", start_of_sidebar + (player_position.x - 1)*scale,
