@@ -49,37 +49,29 @@ There are some unimplemented features still, to make the game complete, and othe
 that would be nice to have. This is a list of the features implemented and still 
 not implemented:
 
-* ~~Case closed, level complete, on the arrest of the correct person~~
-* ~~Cold case, on the arrest of the incorrect person~~
 * Animations
 * Assistants, Liz, Gary and Rufus the german shepherd, to help solve the case
-* ~~A page in the menu, for the controls~~
-* ~~Save the results from a level, so the game remembers completed maps~~
-* ~~Navigate the clue summary menu~~
-* Dismiss clue information with a button press
 * Clues that activate on a timer
 * More complicated level designs, with lakes, roads, and urban areas
 * Lakes 
-* ~~Rivers~~
-* ~~Different types of terrain~~
-* ~~Start screen~~
-* Day night cycle
 * Better name generation
-* A scrollable ledger
 * Houses and buildings 
-* ~~A name generator for optionally generating character names~~
-* ~~Ability to choose between levels~~
 * Many more levels
-* ~~Weather~~
-* Collisions with other persons on the map
 
 ## Third party assets
-The music in this project (found in the third_party_assets folder) is not made or owned by me,
-but comes from the website: https://www.nihilore.com/ <br>
+The resources found in the third_party_assets folder (music and sound effects)  are not made or owned by me.
+The music comes from the website: https://www.nihilore.com/ <br>
 Made by the musician JAY OPIE
 
 It is published under the Creative Commons Attribution 4.0 International license, see:
 https://creativecommons.org/licenses/by/4.0/ 
 
 It has not been modified.
+
+The sound effect comes from the website: https://freesound.org/ <br>
+And is made by RYUSA https://ryusa.bandcamp.com
+It was published under the Creative Commons Attribution 4.0 International license: https://creativecommons.org/licenses/by/4.0/
+
+It has not been modified.
+
  

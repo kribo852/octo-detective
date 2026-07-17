@@ -29,7 +29,6 @@ function ingame.init()
 	ingame.obstacles = {}
 	ingame.obstacle_lookup = function(name) return nil end -- fresh lookup function for obstacles, this is for obstacles named in the map file
 	ingame.grass_generator = ingame.noise_generator.new_random_func(2)
-	ingame.tree_generator = ingame.noise_generator.new_random_func(1)
 	ingame.clock = ingame.day_night_cycle.get_return_object()
 	ingame.control_panel = require("game_states.ingame.control_panel").get_control_panel()
 
@@ -37,10 +36,9 @@ function ingame.init()
 
 	local size = ingame.info_share.get_game_info("map_size")()
 
-	for i=1,size do
+	for i = 1,size do
 		ingame.obstacles[i] = ingame.obstacles[i] or {} -- to not remove obstacles from map file
-		for j=1,size do
-			local chance_for_tree = ingame.tree_generator.smooth_random(i, j)
+		for j = 1,size do
 			if not ingame.obstacles[i][j] and not ingame.clue_handler.collision_with_clue(i, j)
 				and not ingame.river_handler.collision_with_river(i, j)
 				and (love.math.random() < 0.275 ) then
@@ -313,11 +311,17 @@ function ingame.update(delta_time, transition_to_menu_state)
 	ingame.clock.tick(delta_time)
 end
 
+local function play_discover_sound()
+	local audio_source = love.audio.newSource("third_party_assets/ryusa_glockenspiel.mp3", "static")
+	love.audio.play(audio_source)
+end
+
 function ingame.discover_action()
 	local tmp_clue = ingame.clue_handler.can_be_discovered()
 	if tmp_clue and debounce_keyboard.check("space") then
 		ingame.clue_handler.discover_clue(tmp_clue)
 		ingame.control_panel.add_clue(tmp_clue)
+		play_discover_sound()
 	end
 end
 
