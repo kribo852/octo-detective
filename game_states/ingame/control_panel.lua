@@ -24,10 +24,9 @@ local function control_panel_draw(ordered_clues, image_getter)
 
 
 	for index,value in ipairs(ordered_clues) do
-		local image = image_getter(value.name)
-		local scale = slot_size/image:getWidth()-- square images only
+		local image_draw_function = image_getter(value.image)
 		local place = get_place_in_inventory_from_index(index)
-		love.graphics.draw(image, place.x, place.y, 0, scale, scale)
+		image_draw_function(place.x, place.y, 3, 3)-- scale = 3, maybe should make that nicer
 	end
 
 	do

@@ -75,7 +75,7 @@ function clue_handler.can_be_discovered()
 	return match_one(matcher)
 end
 
-function clue_handler.is_visible_on_the_ground()
+function clue_handler.visible_on_the_ground()
 	local all_discovered_clues = get_all_discovered_clues()
 	local matcher =
 	function(clue)
@@ -89,13 +89,13 @@ function clue_handler.is_visible_on_the_ground()
 	for _,value in ipairs(clues_to_draw) do
 		if value.discovery_positions then
 			for _,position_value in ipairs(value.discovery_positions) do
-				table.insert(rtn_stripped_clue_information, {pos_x = position_value[1], pos_y = position_value[2], name=value.name })
+				table.insert(rtn_stripped_clue_information, {pos_x = position_value[1], pos_y = position_value[2], image=value.image, display_on_ground_image=value.display_on_ground_image })
 			end
 		end
 
 		if value.discovery_around then
 			for _,position_value in ipairs(value.discovery_around(clue_handler.around_lookup_func)) do
-				table.insert(rtn_stripped_clue_information, {pos_x = position_value[1], pos_y = position_value[2], name=value.name })
+				table.insert(rtn_stripped_clue_information, {pos_x = position_value[1], pos_y = position_value[2], image=value.image, display_on_ground_image=value.display_on_ground_image })
 			end
 		end
 	end
