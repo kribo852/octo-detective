@@ -1,4 +1,5 @@
 local world_img = love.graphics.newImage("assets/objects.png")
+local image_scale = 3
 
 local image_handler = {
 	tree1 = love.graphics.newQuad(0, 0, 20, 20, world_img),
@@ -31,10 +32,18 @@ function image_handler.get_new_mutable_image_map()
 					other_images[sprite_name] = {image=image, quad=quad}
 					print("loaded a new sprite to the store: "..sprite_name)
 				end
-				return function(x, y, scale_x, scale_y) love.graphics.draw(other_images[sprite_name].image, other_images[sprite_name].quad, x, y, 0, scale_x, scale_y) end
+				return function(x, y, scale_x, scale_y)
+					scale_x = scale_x or image_scale
+					scale_y = scale_y or image_scale
+					love.graphics.draw(other_images[sprite_name].image, other_images[sprite_name].quad, x, y, 0, scale_x, scale_y)
+				end
 			end
 
-			return function(x, y, scale_x, scale_y) love.graphics.draw(world_img, sprite_quad_from_default, x, y, 0, scale_x, scale_y) end
+			return function(x, y, scale_x, scale_y)
+				scale_x = scale_x or image_scale
+				scale_y = scale_y or image_scale
+				love.graphics.draw(world_img, sprite_quad_from_default, x, y, 0, scale_x, scale_y)
+			end
 		end
 	}
 end

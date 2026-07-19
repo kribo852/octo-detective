@@ -2,13 +2,11 @@ local ingame = {
 	obstacles = {},
 	detective_image = love.graphics.newImage("assets/detective.png"),
 	person_image = love.graphics.newImage("assets/person.png"),
-	mobile_phone_image = love.graphics.newImage("assets/call_police_station.png"),
 	grass_texture = love.graphics.newImage("assets/grass_texture.png"),
 	detective = {facing_direction = 1},
 	clue_handler = require "game_states.ingame.clue_handler",
 	mouse_pointer = require "game_states.mouse_pointer",
 	d_p_c = require "game_states.ingame.draw_position_calculator",
-	image_handler = require "game_states.ingame.image_handler",
 	person_handler = require "game_states.ingame.person_handler",
 	level_saver = require "level_saver",
 	theme_handler = require "theme_handler",
@@ -30,7 +28,7 @@ function ingame.init()
 	ingame.grass_generator = ingame.noise_generator.new_random_func(2)
 	ingame.clock = ingame.day_night_cycle.get_return_object()
 	ingame.control_panel = require("game_states.ingame.control_panel").get_control_panel()
-	ingame.image_map = ingame.image_handler.get_new_mutable_image_map()
+	ingame.image_map = require("game_states.ingame.image_handler").get_new_mutable_image_map()
 
 	ingame.read_from_mapreader()
 
@@ -60,13 +58,6 @@ function ingame.read_from_mapreader()
 	local clues = {}
 
 	for i=1, #mapreader.clues do
-	--	if(not ingame.clues_images[mapreader.clues[i].name]) then
-	--		ingame.clues_images[mapreader.clues[i].name] = {}
-	--		ingame.clues_images[mapreader.clues[i].name]["image"] = love.graphics.newImage("assets/"..mapreader.clues[i].image)
-	--		if mapreader.clues[i].display_on_ground_image then
-	--			ingame.clues_images[mapreader.clues[i].name]["display_on_ground_image"] = love.graphics.newImage("assets/"..mapreader.clues[i].display_on_ground_image)
-	--		end
-	--	end
 		clues[mapreader.clues[i].name] = mapreader.clues[i]
 	end
 
@@ -117,11 +108,11 @@ local function draw_obstacles()
 		for j = math.floor(detective.y)-10,math.floor(detective.y)+10 do
 			if ingame.obstacles[i] and ingame.obstacles[i][j] then
 				local draw_x,draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
-				ingame.image_map.get_draw_function(ingame.obstacles[i][j])(draw_x, draw_y, 3, 3)
+				ingame.image_map.get_draw_function(ingame.obstacles[i][j])(draw_x, draw_y)
 			else
 				if (i*13+j*11)%19==0 then
 					local draw_x,draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
-					ingame.image_map.get_draw_function("plants")(draw_x, draw_y, 3, 3)
+					ingame.image_map.get_draw_function("plants")(draw_x, draw_y)
 				end
 			end
 		end
@@ -137,9 +128,9 @@ local function draw_river()
 				local draw_x, draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
 				local draw_x_end, draw_y_end = ingame.d_p_c.calc_end(detective.x, detective.y, i, j)
 				ingame.water_effect.make_water_effect(draw_x, draw_y, draw_x_end, draw_y_end, scale)
+
 				if ingame.river_handler.collision_with_river(i, j) == "crossing" then
-					local draw_x,draw_y = ingame.d_p_c.calc_start(detective.x, detective.y, i, j)
-					ingame.image_map.get_draw_function("crossing_stones")(draw_x, draw_y, 3, 3)
+					ingame.image_map.get_draw_function("crossing_stones")(draw_x, draw_y)
 				end
 			end
 		end
@@ -193,9 +184,9 @@ local function draw_notification_for_arrest_person()
 		local around_func = ingame.make_around_function(ingame.obstacle_lookup)
 		local detective_position = ingame.info_share.game_info.detective_position()
 		for _,value in ipairs(around_func("police_car")) do
-			local draw_x,draw_y = ingame.d_p_c.calc_start(detective_position.x, detective_position.y, value[1], value[2], true)
+			local draw_x,draw_y = ingame.d_p_c.calc_start(detective_position.x, detective_position.y, value[1], value[2])
 
-			love.graphics.draw(ingame.mobile_phone_image, draw_x, draw_y,  0, scale, scale, 10, 10)
+			ingame.image_map.get_draw_function("call_police_station.png")(draw_x, draw_y)
 		end
 
 		if ingame.at_defined_obstacle("police_car") then

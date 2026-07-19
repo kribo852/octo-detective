@@ -22,14 +22,24 @@ add_river {
 	}
 }
 make_clue {
-	name = "footsteps",
+	name = "shoeprints1",
 	type = "object",
 	is_discovered = false,
 	carried = false,
 	image = "footsteps_down.png",
-	description = "Mysterious shoeprints...",
+	description = "Mysterious shoeprints...\nI wonder where they lead",
 	depends_on = none(),
 	discovery_positions = { {23, 7} }
+}
+make_clue {
+	name = "shoeprints2",
+	type = "object",
+	is_discovered = false,
+	carried = false,
+	image = "footsteps_down.png",
+	description = "More shoeprints",
+	depends_on = one("shoeprints1"),
+	discovery_positions = { {22, 15} }
 }
 make_clue {
 	name = "initial information",
@@ -57,11 +67,11 @@ make_clue {
 	is_discovered = false,
 	carried = false,
 	image = "drowned_body.png",
-	description = "Drowned...\nThe clothes seems ragged, is she the woman that lived in the tent camp?",
-	depends_on = one("footsteps"),
+	description = "Drowned...\nThe clothes seems ragged, is she the woman name<disappeared> that lived in the tent camp?",
+	depends_on = one("shoeprints1"),
 	discovery_positions = { {21, 25} }
 }
 add_obstacle {
 	type = "tent",
-	position = {x = 27, y = 3}
+	position = {x = 26, y = 3}
 }
