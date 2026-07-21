@@ -1,5 +1,5 @@
 local noise_generator = {
-	
+
 }
 
 function noise_generator.new_random_func(scale)
@@ -8,7 +8,7 @@ function noise_generator.new_random_func(scale)
 
 		local random_for_position = function(x, y)
 			if not cache_l1[x.."#"..y] then
-				cache_l1[x.."#"..y] = love.math.random()
+				cache_l1[x.."#"..y] = love.math.random() -- this is just to store the random values, so that repeated lookup gives the same value again
 			end
 			return cache_l1[x.."#"..y]
 		end
@@ -18,12 +18,12 @@ function noise_generator.new_random_func(scale)
 
 			if not cache_l2[x.."#"..y] then
 				local sum = 0
-				local no_of_entries = (2*scale+1)^2 
+				local no_of_entries = (2*scale+1)^2
 
 				for i=-scale,scale do
 					for j=-scale,scale do
 						sum = sum + random_for_position(x+i, y+j)
-					end	
+					end
 				end
 				cache_l2[x.."#"..y] = sum / no_of_entries
 			end

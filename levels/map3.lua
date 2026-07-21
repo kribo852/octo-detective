@@ -8,6 +8,10 @@ add_obstacle {
 	type = "police_car",
 	position = {x = -1, y = 19}
 }
+add_obstacle {
+	type = "tent",
+	position = {x = 26, y = 3}
+}
 add_river {
 	x0_y = 15,
 	run = {
@@ -59,7 +63,7 @@ make_clue {
 	display_on_ground_image = "blank_action.png",
 	description = "The camp seems abandoned.",
 	depends_on = none(),
-	discovery_around = around("tent")
+	discovery_positions = { {26, 4} }
 }
 make_clue {
 	name = "victim",
@@ -67,11 +71,17 @@ make_clue {
 	is_discovered = false,
 	carried = false,
 	image = "drowned_body.png",
-	description = "Drowned...\nThe clothes seems ragged, is she the woman name<disappeared> that lived in the tent camp?",
+	description = "Drowned...\nThe clothes seems ragged, is she the woman name<disappeared> that lived in the tent camp?\nThe shoeprints that i found doesn't seem to match her shoes, they are too large.",
 	depends_on = one("shoeprints1"),
 	discovery_positions = { {21, 25} }
 }
-add_obstacle {
-	type = "tent",
-	position = {x = 26, y = 3}
+make_clue {
+	name = "stash",
+	type = "object",
+	is_discovered = false,
+	carried = false,
+	image = "box_container.png",
+	description = "This box looks apart, where can it have come from? Maybe I can call in to the station and see if it has been reported stolen",
+	depends_on = none(),
+	discovery_positions = { {4, 34} }
 }
