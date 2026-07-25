@@ -79,9 +79,41 @@ make_clue {
 	name = "stash",
 	type = "object",
 	is_discovered = false,
-	carried = false,
+	carried = true,
 	image = "box_container.png",
 	description = "This box looks apart, where can it have come from? Maybe I can call in to the station and see if it has been reported stolen",
 	depends_on = none(),
 	discovery_positions = { {4, 34} }
+}
+make_clue {
+	name = "break_in",
+	type = "event",
+	is_discovered = false,
+	carried = true,
+	image = "call_police_station.png",
+	description = "Three persons have been arrested for a break in where a box of jewelry was stolen. The jewelry has not yet been found.",
+	depends_on = one("stash"),
+	discovery_around = around("police_car")
+}
+make_clue {
+	name = "jewelry",
+	type = "object",
+	is_discovered = false,
+	carried = true,
+	image = "jewelry.png",
+	description = "Here is a piece of jewelry, this must be from the break in. The jewelry must be worth a large sum of money.",
+	depends_on = all("victim", "break_in"),
+	discovery_positions = { {10, 4} }
+}
+make_clue {
+	name = "name<thief>",
+	type = "person",
+	is_discovered = false,
+	carried = true,
+	is_murderer = true,
+	image = "portrait.png",
+	display_on_ground_image = "call_police_station.png",
+	description = "name<thief>, arrested for the break in, has a pair of shoes matching the shoeprints that I found near the camp.",
+	depends_on = all("jewelry"),
+	discovery_around = around("police_car")
 }
