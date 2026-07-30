@@ -49,14 +49,16 @@ There are some unimplemented features still, to make the game complete, and othe
 that would be nice to have. This is a list of the features implemented and still 
 not implemented:
 
+* Lighting from multiple different sources
 * Animations
 * Assistants, Liz, Gary and Rufus the german shepherd, to help solve the case
 * Clues that activate on a timer
 * More complicated level designs, with lakes, roads, and urban areas
 * Lakes 
 * Better name generation
-* Houses and buildings 
+* Houses and buildings, which the player can enter and examine
 * Many more levels
+* Fences, that work a bit like obstacles, but sits between squares
 
 ## Third party assets
 The resources found in the third_party_assets folder (music and sound effects)  are not made or owned by me.
