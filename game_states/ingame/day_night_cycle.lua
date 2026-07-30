@@ -16,11 +16,13 @@ local night_shader_code = [[
             mix(gray_scale, pixelColorAtTexture[1], 0.5+solar_position/2), 
             mix(gray_scale, pixelColorAtTexture[2], 0.5+solar_position/2)); //mixes a color with a gray scaled color
 
+            float light_from_aura = clamp((0.3/length_to_center)*(0.25+3.0*solar_position/4), 0, 0.5);
+
 
         	vec3 light_rgb = vec3(
-				clamp((0.3/length_to_center)*(0.5+solar_position/2) + solar_position, 0, 1),
-				clamp((0.3/length_to_center)*(0.5+solar_position/2) + solar_position, 0, 1),
-				clamp((0.3/length_to_center)*(0.5+solar_position/2) + solar_position, 0, 1)
+				clamp(light_from_aura + solar_position, 0, 1),
+				clamp(light_from_aura + solar_position, 0, 1),
+				clamp(light_from_aura + solar_position, 0, 1)
         	);
             
             vec3 pixel_color = gray_scaled_color*light_rgb;
