@@ -26,7 +26,7 @@ function ingame.init()
 	ingame.obstacles = {}
 	ingame.obstacle_lookup = function(name) return nil end -- fresh lookup function for obstacles, this is for obstacles named in the map file
 	ingame.grass_generator = ingame.noise_generator.new_random_func(2)
-	ingame.clock = ingame.day_night_cycle.get_return_object()
+	ingame.clock = ingame.day_night_cycle.get_return_object("dynamic")
 	ingame.control_panel = require("game_states.ingame.control_panel").get_control_panel()
 	ingame.image_map = require("game_states.ingame.image_handler").get_new_mutable_image_map()
 
