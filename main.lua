@@ -19,15 +19,21 @@ function love.load()
 	level_selector = require "game_states.ingame.level_selector"
 	debounce_keyboard = require "game_states.debounced_keyboard"
 	menu_view_controls = require "game_states.menu_view_controls"
+	menu_options = require "game_states.options"
 
 	init_game_state_transitions()
+
+	local info_share = require "info_share"
+	local theme_handler = require "theme_handler"
+
+	info_share.register_consumers_for_channel("music_chnl", theme_handler.continue_playing)
 
 	cur_level = ""
 end
 
 function init_game_state_transitions()
 	game_state_engine.register_state("menu", menu.update, menu.draw, menu.load, nil)
-	game_state_engine.register_update_arguments("menu", {"to_level_selector_state", "to_view_controls"})
+	game_state_engine.register_update_arguments("menu", {"to_level_selector_state", "to_view_controls", "to_menu_options"})
 	game_state_engine.register_draw_arguments("menu", {})
 
 	game_state_engine.register_state("ingame", ingame.update, ingame.draw, ingame.init, ingame.tear_down)
@@ -42,6 +48,11 @@ function init_game_state_transitions()
 	game_state_engine.register_update_arguments("view_controls", {"to_menu_state"})
 	game_state_engine.register_draw_arguments("view_controls", {})
 
+
+	game_state_engine.register_state("menu_options", menu_options.update, menu_options.draw)
+	game_state_engine.register_update_arguments("menu_options", {"to_menu_state"})
+	game_state_engine.register_draw_arguments("menu_options", {})
+
 	game_state_engine.init("menu") --start in a menu state
 end
 
@@ -51,7 +62,8 @@ function love.update(delta_time)
 		  to_game_state = to_game_state,
 		  to_menu_state = to_menu_state, 
 		  to_level_selector_state = to_level_selector_state,
-		  to_view_controls = to_state_meta_creator("view_controls")
+		  to_view_controls = to_state_meta_creator("view_controls"),
+		  to_menu_options = to_state_meta_creator("menu_options")
 		}
 	)
 	debounce_keyboard.update()

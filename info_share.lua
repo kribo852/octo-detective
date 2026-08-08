@@ -4,7 +4,9 @@ local info_meta_table = {
     end
 }
 
-local info_share = { }
+local info_share = { 
+	info_channels = {}
+}
 
 function info_share.clear()
 	info_share.game_info = {}
@@ -33,6 +35,25 @@ end
 
 function info_share.get_game_info(key)
 	return info_share.game_info[key] or function() return nil end
+end
+
+function info_share.register_consumers_for_channel(channel, consumer)
+
+	if not info_share.info_channels[channel] then
+		info_share.info_channels[channel] = {}
+	end
+
+	table.insert(info_share.info_channels[channel], consumer)
+end
+
+function info_share.push_to_channel(channel, value)
+	if not info_share.info_channels[channel] then
+		return
+	end
+
+	for _,consumer in ipairs(info_share.info_channels[channel]) do
+		consumer(value)
+	end
 end
 
 return info_share
