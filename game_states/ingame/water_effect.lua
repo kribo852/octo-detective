@@ -18,15 +18,15 @@ local shader3 = [[
         float o_y = 3.14*(screen_coords[1] - start_y)/30;
 
         float sinef_a = sin((ticker + o_x + o_y));
-        float sinef_b = 0.5*sin((ticker - o_x + o_y)*5);
-        float sinef_c = 0.5*sin((ticker + o_x - o_y*3));
+        float sinef_b = sin((ticker - o_x + o_y)*5);
+        float sinef_c = sin((ticker + o_x - o_y*3));
 
         vec4 pixelColorAtTexture = Texel(texture, texture_coords+get_random(ticker, texture_coords.x, texture_coords.y));
 
         vec4 pixelColor = vec4(
-            mix(0.035, pixelColorAtTexture[0], 0.2 + 0.1 * (sinef_a) ), // R
-            mix(0.1, pixelColorAtTexture[1], 0.2 + 0.1 * (sinef_b) ), // G
-            mix(0.075, pixelColorAtTexture[2], 0.2 + 0.1 * (sinef_c) ), // B
+            mix(0.055, pixelColorAtTexture[0], 0.3 + 0.15 * (sinef_b) ), // R
+            mix(0.125, pixelColorAtTexture[1], 0.3 + 0.15 * (sinef_a) ), // G
+            mix(0.035, pixelColorAtTexture[2], 0.3 + 0.15 * (sinef_c) ), // B
             1 // A (full opacity)
         );
 
@@ -46,7 +46,6 @@ function water_effect.make_water_effect(start_x, start_y, end_x, end_y, scale)
 end
 
 function water_effect.load()
-
 	water_effect.shader = love.graphics.newShader(shader3)
 	water_effect.background_image = love.graphics.newImage("assets/river_bottom.png")
 end

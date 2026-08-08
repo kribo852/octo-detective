@@ -65,6 +65,7 @@ end
 
 function ingame.tear_down()
 	ingame.info_share.clear()
+	ingame.weather.tear_down()
 end
 
 function ingame.compose_lookup(mapreader)

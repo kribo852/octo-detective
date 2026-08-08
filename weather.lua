@@ -93,13 +93,16 @@ function weather.init()
 
 
     -- Skapa en ljudkälla från datan
-    local noiseSound = love.audio.newSource(sound_data)
+    weather.noiseSound = love.audio.newSource(sound_data)
 
-    noiseSound:setLooping(true)
-    noiseSound:play()
+    weather.noiseSound:setLooping(true)
+    weather.noiseSound:play()
 end
 
-
+function weather.tear_down()
+	weather.noiseSound:stop()
+	weather.noiseSound:release()
+end
 
 
 
