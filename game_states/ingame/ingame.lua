@@ -45,6 +45,7 @@ function ingame.init()
 		end
 	end
 	ingame.clue_handler.set_get_player_position(ingame.info_share.game_info.detective_position)
+	ingame.weather.init()
 	ingame.game_phase = "ongoing"
 end
 
