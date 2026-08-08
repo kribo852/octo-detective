@@ -1,11 +1,15 @@
 local clue_handler = {
-
+	info_share = require "info_share"
 }
+
+local function get_clues()
+	return clue_handler.info_share.get_game_info("clues")()
+end
 
 local function get_all_discovered_clues()
  	local rtn_list = {}
 
- 	for key,clue in pairs(clue_handler.clues) do
+ 	for key,clue in pairs(get_clues()) do
  		if clue.is_discovered then
  			rtn_list[clue.name] = true
  			--print(clue.name)
@@ -15,15 +19,11 @@ local function get_all_discovered_clues()
 end
 
 local function match_one(matcher)
-	for _, clue in pairs(clue_handler.clues) do
+	for _, clue in pairs(get_clues()) do
 		if matcher(clue) then
 			return clue
 		end
 	end
-end
-
-function clue_handler.set_clues(clues)
-	clue_handler.clues = clues
 end
 
 function clue_handler.set_get_player_position(player_position_func)
@@ -105,7 +105,7 @@ end
 function clue_handler.find_all_matching(matcher)
 	local rtn_list = {}
 
-	for key,clue in pairs(clue_handler.clues) do
+	for key,clue in pairs(get_clues()) do
 		if matcher(clue) then
 			table.insert(rtn_list, clue)
 		end
@@ -148,7 +148,7 @@ function clue_handler.get_active_clue_description()
 end
 
 function clue_handler.collision_with_clue(xpos, ypos)
-	for key,value in pairs(clue_handler.clues) do
+	for key,value in pairs(get_clues()) do
 		if not value.discovery_positions then
 			goto continue
 		end

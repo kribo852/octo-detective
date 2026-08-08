@@ -5,8 +5,8 @@ local mapreader = {
 	info_share = require "info_share"
 }
 
-function mapreader.make_clue(clue)
-	table.insert(mapreader.clues, {
+function mapreader.make_clue(clue, clues)
+	clues[mapreader.name_tokens(clue.name)] = {
 			name = mapreader.name_tokens(clue.name),
 			type = clue.type,
 			is_murderer = clue.is_murderer,
@@ -16,10 +16,10 @@ function mapreader.make_clue(clue)
 			display_on_ground_image = clue.display_on_ground_image,
 			description = mapreader.name_tokens(clue.description),
 			depends_on = clue.depends_on,
-			discovery_positions = clue.discovery_positions, -- discover at these positions
+			discovery_positions = clue.discovery_positions, -- discovered at these positions
 			discovery_wait = clue.discovery_wait,
 			discovery_around = clue.discovery_around
-	})
+	}
 end
 
 function mapreader.set_size(size_table)
@@ -52,7 +52,7 @@ function mapreader.add_river(river)
 end
 
 function mapreader.readfile(filename)
-	mapreader.clues = {} -- clear previous data
+	local clues = {} -- clear previous data
 	mapreader.obstacles = {}
 	local persons = {}
 	mapreader.name_generator.reset()
@@ -60,7 +60,7 @@ function mapreader.readfile(filename)
 	loadfile ("levels/"..filename, "t",
 		{
 			set_size=mapreader.set_size,
-			make_clue=mapreader.make_clue,
+			make_clue=function(clue) mapreader.make_clue(clue, clues) end,
 			set_detective=function(person) mapreader.set_detective(person, persons) end,
 			add_obstacle=mapreader.add_obstacle,
 			add_person=function(person) mapreader.add_person(person, persons) end,
@@ -71,6 +71,8 @@ function mapreader.readfile(filename)
 			add_river=mapreader.add_river
 		}
 	)()
+
+	mapreader.info_share.register_game_info("clues", function() return clues end)
 	mapreader.info_share.register_game_info("persons", function() return persons end)
 end
 

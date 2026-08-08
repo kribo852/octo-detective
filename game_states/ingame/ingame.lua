@@ -55,15 +55,8 @@ function ingame.read_from_mapreader()
 
 	ingame.depends_on = mapreader.depends_on
 
-	local clues = {}
-
-	for i=1, #mapreader.clues do
-		clues[mapreader.clues[i].name] = mapreader.clues[i]
-	end
-
 	ingame.compose_lookup(mapreader)
 	ingame.info_share.register_game_info("obstacle_lookup", ingame.obstacle_lookup)
-	ingame.clue_handler.set_clues(clues)
 	ingame.person_handler.set_persons()
 	ingame.clue_handler.set_around_lookup_function(ingame.make_around_function(ingame.person_handler.get_person_lookup, ingame.obstacle_lookup))
 	ingame.river_handler.set_river()
