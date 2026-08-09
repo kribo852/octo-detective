@@ -11,7 +11,7 @@ function theme_handler.play(theme)
 	end
 
 	theme_handler.audio_source = love.audio.newSource(theme_handler.themes[theme], "stream")
-	theme_handler.audio_source:setVolume(0.25)
+	--theme_handler.audio_source:setVolume(0.25)
 
 	love.audio.play(theme_handler.audio_source)
 end

@@ -23,12 +23,19 @@ function weather.update()
 		end
 	end
 
+	weather.update_rain_volume()
+end
 
+function weather.update_rain_volume()
+	weather.rain_phase_roll = weather.rain_phase_roll + (math.pi/300)
+
+	--weather.rain_sound1:setVolume(( 1 + math.sin(weather.rain_phase_roll) ) / 2)
+	weather.rain_sound2:setVolume( -(math.sin(weather.rain_phase_roll) - 1 ) / 2)
 end
 
 function weather.draw()
 	local r, g, b, a = love.graphics.getColor()
-	love.graphics.setColor(0.1, 0.15, 0.2, 0.12)
+	love.graphics.setColor(0.1, 0.15, 0.2, 0.3)
 	local prev_line_width = love.graphics.getLineWidth()
 	love.graphics.setLineWidth(5)
 
@@ -40,68 +47,73 @@ function weather.draw()
 	love.graphics.setColor(r, g, b, a)
 end
 
-local function mix_in_audio_frequency(sound_data, amplitude, smoothness)
+local function get_smooth_random_noise(length, smoothness)
+	local white_noise = {}
 
-	local previous_sample = amplitude * (love.math.random() * 2 - 1)
+	for i=1,length do
+		white_noise[i] = (love.math.random() * 2 - 1)
+	end
 
-	for i = 0, sound_data:getSampleCount()/2 - 1 do
-		local current_sample = amplitude * (love.math.random() * 2 - 1)
+	local smooth_noise = {}
+	local min = 0
+	local max = 0
 
-        previous_sample = previous_sample * smoothness + (1 - smoothness) * current_sample
+	for i=1,length do
+		local sum = 0
+		for j=-smoothness,smoothness do
+			sum = sum + white_noise[((i+j+length)%length)+1]*math.exp(-2*math.abs(j / smoothness))
+		end
+		smooth_noise[i] = sum
+		if min > sum then
+			min = sum
+		end
+		if max < sum then
+			max = sum
+		end
+	end
 
-        local earlier_sample_data = sound_data:getSample( i )
+	for i=1,length do
+		smooth_noise[i] = (smooth_noise[i] - min) / ((max - min) / 2) - 1
+	end
 
-        sound_data:setSample(i, previous_sample + earlier_sample_data)
-        sound_data:setSample(sound_data:getSampleCount() - 1 - i, previous_sample + earlier_sample_data)
-    end
+	return smooth_noise
 end
 
 function weather.init()
 	-- Definiera inställningar
     local sampleRate = 44100
-    local duration = 2 -- Längd i sekunder
+    local duration = 5 -- Längd i sekunder
 
     -- Skapa en ny SoundData-behållare
-    local sound_data = love.sound.newSoundData(sampleRate*duration, sampleRate, 16, 1)
 
-    mix_in_audio_frequency(sound_data, 1.0, 0.99)
-    mix_in_audio_frequency(sound_data, 0.5, 0.97)
-    mix_in_audio_frequency(sound_data, 0.25, 0.94)
+    local noise1_array = get_smooth_random_noise(sampleRate*duration, 8)
+    local noise2_array = get_smooth_random_noise(sampleRate*duration, 11)
 
-    do --normalize
-    	local min = 0
-		local max = 0
-    	for i=0,sound_data:getSampleCount()-1 do
+    local sound_data1 = love.sound.newSoundData(sampleRate*duration, sampleRate, 16, 1)
+    local sound_data2 = love.sound.newSoundData(sampleRate*duration, sampleRate, 16, 1)
 
-    		local earlier_sample_data = sound_data:getSample( i )
-
-    		if earlier_sample_data < min then
-    			min = earlier_sample_data
-    		end
-
-    		if earlier_sample_data > max then
-    			max = earlier_sample_data
-    		end
-
-    	end
-    	for i = 0,sound_data:getSampleCount()-1 do
-    		local earlier_sample_data = sound_data:getSample( i )
-    		local new_amplitude = (earlier_sample_data - min)/(max - min)
-    		sound_data:setSample(i, new_amplitude - 1)
-    	end
-	end
+    for i = 0, sampleRate*duration-1 do
+    	sound_data1:setSample(i, noise1_array[i+1])
+    	sound_data2:setSample(i, noise2_array[i+1])
+    end
 
 
     -- Skapa en ljudkälla från datan
-    weather.noiseSound = love.audio.newSource(sound_data)
+    weather.rain_sound1 = love.audio.newSource(sound_data1)
+    weather.rain_sound2 = love.audio.newSource(sound_data2)
 
-    weather.noiseSound:setLooping(true)
-    weather.noiseSound:play()
+    weather.rain_sound1:setLooping(true)
+    weather.rain_sound1:play()
+    weather.rain_sound2:setLooping(true)
+    weather.rain_sound2:play()
+    weather.rain_phase_roll = 0
 end
 
 function weather.tear_down()
-	weather.noiseSound:stop()
-	weather.noiseSound:release()
+	weather.rain_sound1:stop()
+	weather.rain_sound1:release()
+	weather.rain_sound2:stop()
+	weather.rain_sound2:release()
 end
 
 
