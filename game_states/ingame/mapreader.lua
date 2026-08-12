@@ -51,6 +51,10 @@ function mapreader.add_river(river)
 	mapreader.info_share.register_game_info("river", function() return river end)
 end
 
+function mapreader.add_light_sources(light_sources)
+	mapreader.info_share.register_game_info("light_sources", function() return light_sources end)
+end
+
 function mapreader.readfile(filename)
 	local clues = {} -- clear previous data
 	mapreader.obstacles = {}
@@ -68,7 +72,8 @@ function mapreader.readfile(filename)
 			none=mapreader.none_clues,
 			one=mapreader.one_clues,
 			all=mapreader.all_clues,
-			add_river=mapreader.add_river
+			add_river=mapreader.add_river,
+			add_light_sources=mapreader.add_light_sources 
 		}
 	)()
 

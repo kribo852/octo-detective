@@ -29,8 +29,8 @@ end
 function weather.update_rain_volume()
 	weather.rain_phase_roll = weather.rain_phase_roll + (math.pi/300)
 
-	--weather.rain_sound1:setVolume(( 1 + math.sin(weather.rain_phase_roll) ) / 2)
-	weather.rain_sound2:setVolume( -(math.sin(weather.rain_phase_roll) - 1 ) / 2)
+	weather.rain_sound1:setVolume( (1 + math.sin(weather.rain_phase_roll)) / 2)
+	weather.rain_sound2:setVolume( -(math.sin(weather.rain_phase_roll) - 1) / 2)
 end
 
 function weather.draw()
@@ -86,8 +86,8 @@ function weather.init()
 
     -- Skapa en ny SoundData-behållare
 
-    local noise1_array = get_smooth_random_noise(sampleRate*duration, 8)
-    local noise2_array = get_smooth_random_noise(sampleRate*duration, 11)
+    local noise1_array = get_smooth_random_noise(sampleRate*duration, 4)
+    local noise2_array = get_smooth_random_noise(sampleRate*duration, 8)
 
     local sound_data1 = love.sound.newSoundData(sampleRate*duration, sampleRate, 16, 1)
     local sound_data2 = love.sound.newSoundData(sampleRate*duration, sampleRate, 16, 1)

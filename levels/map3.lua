@@ -117,3 +117,32 @@ make_clue {
 	depends_on = all("jewelry"),
 	discovery_around = around("police_car")
 }
+
+local police_car_light_timer = 0
+local camp_fire_light_flicker_timer = 0
+local camp_fire_light_strength = 0.04
+
+add_light_sources {
+	{
+		position = function() return {x = -1, y = 19} end,
+		colour = function() police_car_light_timer = police_car_light_timer + 1
+		 	if police_car_light_timer % 200 < 100 then
+				return {red = 0, green=0.2, blue=0.5}
+		 	else
+		 		return {red = 0.6, green=0, blue=0.1}
+		 	end 
+		end,
+		strength = function() return 0.04 end
+	},
+	{
+		position = function() return {x = 26, y = 3} end,
+		colour = function() return {red = 0.5, green=0.4, blue=0.1} end,
+		strength = function()
+			camp_fire_light_flicker_timer = camp_fire_light_flicker_timer + 1 
+			if camp_fire_light_flicker_timer % 10 == 0 then
+				camp_fire_light_strength = 0.025 + ((17*camp_fire_light_flicker_timer)%11)*0.003
+		 	end
+		 	return camp_fire_light_strength
+		end
+	}
+}
